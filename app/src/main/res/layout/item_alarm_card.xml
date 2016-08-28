@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_alarm_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/color_shake_power_light"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/alarm_item_padding_top"
+        android:paddingBottom="@dimen/alarm_item_padding_bottom"
+        android:paddingLeft="@dimen/alarm_item_padding_left"
+        android:paddingRight="@dimen/alarm_item_padding_right">
+
+        <TextView
+            android:id="@+id/tv_alarm_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textSize="32sp"
+            android:textColor="@android:color/white"
+            tools:text = "12:00"/>
+
+        <TextView
+            android:id="@+id/tv_repeat_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/tv_alarm_time"
+            android:layout_marginTop="4dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            tools:text = "Mon, Tue, Wed"/>
+
+        <TextView
+            android:id="@+id/tv_alarm_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_alarm_time"
+            android:paddingLeft="16dp"
+            android:layout_alignBaseline="@id/tv_alarm_time"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            tools:text="Wake up"/>
+
+        <Switch
+            android:id="@+id/sw_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"/>
+
+    </RelativeLayout>
+
+    <!--<LinearLayout-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="64dp"-->
+        <!--android:background="?android:attr/selectableItemBackground">-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/iv_alarm_item_color_strip"-->
+            <!--android:layout_width="4dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:visibility="gone"-->
+            <!--tools:background="@android:color/holo_blue_dark" />-->
+
+        <!--<LinearLayout-->
+            <!--android:id="@+id/linear_alarm_info"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:paddingLeft="8dp">-->
+
+
+
+            <!--<LinearLayout-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginLeft="8dp">-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/tv_alarm_label"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:textSize="18sp"-->
+                    <!--android:textColor="@android:color/white"-->
+                    <!--tools:text="Wake up"/>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/tv_repeat_days"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:textSize="16sp"-->
+                    <!--android:textColor="@android:color/white"-->
+                    <!--tools:text = "Mon, Tue, Wed"/>-->
+
+            <!--</LinearLayout>-->
+
+        <!--</LinearLayout>-->
+
+        <!--<Switch-->
+            <!--android:id="@+id/sw_enable"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"/>-->
+
+    <!--</LinearLayout>-->
+
+</android.support.v7.widget.CardView>

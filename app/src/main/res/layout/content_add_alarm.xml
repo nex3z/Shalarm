@@ -1,0 +1,130 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".presentation.ui.activity.ModifyAlarmActivity"
+    tools:showIn="@layout/activity_add_alarm">
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <ImageView
+            style="@style/AlarmDetailIcon"
+            android:src="@drawable/ic_repeat_24dp" />
+
+        <TextView
+            style="@style/AlarmDetailItem"
+            android:text="@string/alarm_detail_repeat" />
+
+    </TableRow>
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
+        <com.nex3z.shalarm.presentation.ui.misc.ToggleButtonGroup
+            android:id="@+id/toggle_weekdays"
+            app:backgroundColor="@color/colorAccent"
+            app:buttonSize="42dp"
+            android:textSize="18sp" />
+
+    </TableRow>
+
+    <TableRow>
+        <View style="@style/AlarmDetailItemSeparator"/>
+    </TableRow>
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <ImageView
+            style="@style/AlarmDetailIcon"
+            android:src="@drawable/ic_ringtone_24dp" />
+
+        <Button
+            android:id="@+id/btn_ringtone"
+            style="@style/AlarmDetailItem"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:textAllCaps="false"
+            android:fontFamily="sans-serif"
+            android:text="Ringtone" />
+
+    </TableRow>
+
+    <TableRow>
+        <View style="@style/AlarmDetailItemSeparator"/>
+    </TableRow>
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <ImageView
+            style="@style/AlarmDetailIcon"
+            android:src="@drawable/ic_vibration_24dp" />
+
+        <Switch
+            android:id="@+id/sw_vibrate"
+            style="@style/AlarmDetailItem"
+            android:layout_weight="1"
+            android:text="@string/alarm_detail_vibrate" />
+
+    </TableRow>
+
+    <TableRow>
+        <View style="@style/AlarmDetailItemSeparator"/>
+    </TableRow>
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <ImageView
+            style="@style/AlarmDetailIcon"
+            android:src="@drawable/ic_shake_power_24dp" />
+
+        <TextView
+            style="@style/AlarmDetailItem"
+            android:text="@string/alarm_detail_shake_power" />
+
+    </TableRow>
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
+        <SeekBar
+            android:id="@+id/sb_shake_power"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+    </TableRow>
+
+    <TableRow>
+        <View style="@style/AlarmDetailItemSeparator"/>
+    </TableRow>
+
+    <TableRow style="@style/AlarmDetailTableRow">
+
+        <ImageView
+            style="@style/AlarmDetailIcon"
+            android:layout_gravity="top"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_label_24dp" />
+
+        <EditText
+            android:id="@+id/edit_label"
+            style="@style/AlarmDetailItem"
+            android:layout_gravity="top"
+            android:layout_marginTop="16dp"
+            android:background="@android:color/transparent"
+            android:hint="@string/alarm_detail_label_hint"/>
+
+    </TableRow>
+
+</TableLayout>
+
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="64dp">
+
+    <ImageView
+        android:id="@+id/iv_alarm_item_color_strip"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        tools:background="@android:color/holo_blue_dark" />
+
+    <LinearLayout
+        android:id="@+id/linear_alarm_info"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:paddingLeft="8dp">
+
+        <TextView
+            android:id="@+id/tv_alarm_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="32sp"
+            tools:text = "12:00"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp">
+
+            <TextView
+                android:id="@+id/tv_alarm_label"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                tools:text="Wake up"/>
+
+            <TextView
+                android:id="@+id/tv_repeat_days"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:gravity="center_vertical"
+                android:textSize="16sp"
+                tools:text = "Mon, Tue, Wed"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/sw_enable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+</LinearLayout>

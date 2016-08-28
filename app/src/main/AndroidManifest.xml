@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.nex3z.shalarm">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <application
+        android:name=".app.App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:name=".presentation.ui.activity.AlarmListActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".presentation.ui.activity.AddAlarmActivity"
+            android:label="@string/title_activity_add_alarm"
+            android:parentActivityName=".presentation.ui.activity.AlarmListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>
+        </activity>
+
+        <activity
+            android:name=".presentation.ui.activity.EditAlarmActivity"
+            android:label="@string/title_activity_edit_alarm"
+            android:parentActivityName=".presentation.ui.activity.AlarmListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>
+        </activity>
+
+        <activity
+            android:name=".presentation.alert.ui.AlertActivity"
+            android:label="@string/title_activity_alert"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <provider
+            android:name=".data.provider.AlarmProvider"
+            android:authorities="com.nex3z.shalarm.alarm"
+            android:exported="false"/>
+
+        <service
+            android:name=".presentation.alert.AlarmService"
+            android:enabled="true"
+            android:process="com.nex3z.shalarm.service.alarmServiceProcess">
+        </service>
+
+        <receiver
+            android:name=".presentation.alert.AlarmServiceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".presentation.alert.AlertBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+        </receiver>
+
+    </application>
+
+</manifest>
