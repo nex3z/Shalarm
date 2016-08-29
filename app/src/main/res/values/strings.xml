@@ -39,6 +39,7 @@
     <string name="pref_shake_detector_calibrate">Calibrate</string>
 
     <string name="calibrate_message">Please shake your device repeatedly as hard as you can until the number below stops increasing, then press the Calibrate button below. Be careful.</string>
+    <string name="invalid_calibrate_message">Please shake your device harder to get a bigger Maximum Force first.</string>
     <string name="maximum_force">Maximum Force</string>
     <string name="text_button_calibrate">Calibrate</string>
 

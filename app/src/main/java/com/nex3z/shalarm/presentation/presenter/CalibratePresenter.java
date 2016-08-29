@@ -2,6 +2,7 @@ package com.nex3z.shalarm.presentation.presenter;
 
 import android.util.Log;
 
+import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.presentation.ui.CalibrateView;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
@@ -28,8 +29,12 @@ public class CalibratePresenter implements Presenter {
     }
 
     public void onConfirm() {
-        SensorUtility.setMaxForce(mView.getContext(), mMaxForce);
-        mView.finishView();
+        if (mMaxForce < 10) {
+            mView.showMessage(mView.getContext().getString(R.string.invalid_calibrate_message));
+        } else {
+            SensorUtility.setMaxForce(mView.getContext(), mMaxForce);
+            mView.finishView();
+        }
     }
 
     @Override
