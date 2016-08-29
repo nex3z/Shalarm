@@ -52,6 +52,8 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    private float mMaxForce = 0;
+    private float mTargetForce;
 
     @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
 
@@ -187,13 +189,16 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         float gX = x / SensorManager.GRAVITY_EARTH;
         float gY = y / SensorManager.GRAVITY_EARTH;
         float gZ = z / SensorManager.GRAVITY_EARTH;
-        float force = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
+        float force = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ) - ONE_G;
 
-        float prop = (force - ONE_G)/MAX_FORCE;
-        mCircle.expand(prop);
+        if (force > mMaxForce) {
+            mMaxForce = force;
 
-        int power = (int) (100 * prop);
-        mPresenter.onShakePowerChanged(power);
+            mPresenter.onShakePowerChanged((int)(force / MAX_FORCE * 100));
+
+            float prop = force / mTargetForce;
+            mCircle.expand(prop);
+        }
     }
 
     @Override
@@ -201,14 +206,15 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     private void init(AlarmModel alarmModel) {
         initAlert();
-        initShakeDetector();
+        initShakeDetector(alarmModel);
         initPresenter(alarmModel);
         initPhoneStateListener();
     }
 
-    private void initShakeDetector() {
+    private void initShakeDetector(AlarmModel alarmModel) {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mTargetForce = alarmModel.getShakePower() * MAX_FORCE / 100;
     }
 
     private void initAlert() {

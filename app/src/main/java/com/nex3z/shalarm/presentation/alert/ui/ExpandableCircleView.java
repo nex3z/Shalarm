@@ -20,7 +20,7 @@ public class ExpandableCircleView extends View {
     private static final int DEFAULT_HEIGHT = 200;
     private static final int DEFAULT_WIDTH = 200;
     private static final int DEFAULT_EXPAND_ANIMATION_DURATION = 100;
-    private static final float DEFAULT_INNER_CIRCLE_PROPORTION = 0.5f;
+    private static final float DEFAULT_INNER_CIRCLE_PROPORTION = 0;
 
     private static final String SUPER_STATE_KEY = "super_state";
     private static final String OUTER_COLOR_KEY = "outer_color";
@@ -146,9 +146,7 @@ public class ExpandableCircleView extends View {
      * @param proportion the proportion of the inner circle to expand
      */
     public void expand(float proportion) {
-        if (proportion > 1) {
-            return;
-        }
+        proportion = proportion > 1 ? 1 : proportion;
 
         if (mExpandAnimator.isRunning()) {
             mExpandAnimator.cancel();
