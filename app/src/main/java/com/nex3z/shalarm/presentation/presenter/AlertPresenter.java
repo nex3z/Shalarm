@@ -9,6 +9,7 @@ import com.nex3z.shalarm.presentation.alert.ui.AlertView;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.utility.AlarmScheduleUtility;
+import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
 public class AlertPresenter implements Presenter {
     private static final String LOG_TAG = AlertPresenter.class.getSimpleName();
@@ -17,6 +18,8 @@ public class AlertPresenter implements Presenter {
     private UseCase mUpdateAlarm;
     private AlarmModelDataMapper mMapper;
     private AlertView mView;
+    private float mCurrentForce;
+    private float mTargetForce;
 
     public AlertPresenter(AlarmModel alarmModel, UseCase updateAlarm, AlarmModelDataMapper mapper) {
         mAlarmModel = alarmModel;
@@ -29,6 +32,11 @@ public class AlertPresenter implements Presenter {
     }
 
     public void initialize() {
+        mCurrentForce = 0;
+        float maxForce = SensorUtility.getMaxForce(mView.getContext());
+        mTargetForce = mAlarmModel.getShakePower() * maxForce / 100;
+        Log.v(LOG_TAG, "initialize(): mMaxForce = " + maxForce + ", mTargetForce = " + mTargetForce);
+
         mView.setRingtone(mAlarmModel.getRingtone());
 
         mView.startRingtone();
@@ -50,11 +58,15 @@ public class AlertPresenter implements Presenter {
         mView.finishView();
     }
 
-    public void onShakePowerChanged(int power) {
-        Log.v(LOG_TAG, "onShakePowerChanged(): power = " + power);
-        if (power >= mAlarmModel.getShakePower()) {
-            Log.v(LOG_TAG, "onShakePowerChanged(): cancel alarm");
-            onAlertCanceled();
+    public void onShakeForceChanged(float force) {
+        if (force > mCurrentForce) {
+            mCurrentForce = force;
+            Log.v(LOG_TAG, "onShakeForceChanged(): mCurrentForce = " + mCurrentForce);
+            mView.renderForce(mCurrentForce, mTargetForce);
+
+            if (force >= mTargetForce) {
+                onAlertCanceled();
+            }
         }
     }
 

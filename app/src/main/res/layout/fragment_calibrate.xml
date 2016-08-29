@@ -1,0 +1,49 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".presentation.ui.fragment.CalibrateFragment"
+    tools:showIn="@layout/activity_calibrate">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/calibrate_message"
+        android:textSize="16sp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="32dp"
+        android:text="@string/maximum_force"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"/>
+
+    <TextView
+        android:id="@+id/tv_maximum_force"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:layout_gravity="center_horizontal"
+        android:textSize="48sp"
+        android:textColor="@android:color/black"
+        tools:text="130"/>
+
+    <Button
+        android:id="@+id/btn_calibrate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/text_button_calibrate"/>
+
+</LinearLayout>

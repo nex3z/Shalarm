@@ -17,6 +17,8 @@ public interface AlertView {
 
     void stopVibrate();
 
+    void renderForce(float current, float target);
+
     void showResult(long time);
 
     void showMessage(String message);

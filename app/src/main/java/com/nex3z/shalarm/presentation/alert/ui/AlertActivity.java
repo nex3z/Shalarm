@@ -32,6 +32,7 @@ import com.nex3z.shalarm.presentation.alert.AlertWakeLock;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.AlertPresenter;
+import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +54,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private float mMaxForce = 0;
+    private float mCurrentForce = 0;
     private float mTargetForce;
 
     @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
@@ -181,24 +183,14 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     }
 
     @Override
+    public void renderForce(float current, float target) {
+        mCircle.expand(current / target);
+    }
+
+    @Override
     public void onSensorChanged(SensorEvent event) {
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
-
-        float gX = x / SensorManager.GRAVITY_EARTH;
-        float gY = y / SensorManager.GRAVITY_EARTH;
-        float gZ = z / SensorManager.GRAVITY_EARTH;
-        float force = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ) - ONE_G;
-
-        if (force > mMaxForce) {
-            mMaxForce = force;
-
-            mPresenter.onShakePowerChanged((int)(force / MAX_FORCE * 100));
-
-            float prop = force / mTargetForce;
-            mCircle.expand(prop);
-        }
+        float force = SensorUtility.calculateForce(event);
+        mPresenter.onShakeForceChanged(force);
     }
 
     @Override
@@ -214,6 +206,10 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     private void initShakeDetector(AlarmModel alarmModel) {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        mMaxForce = SensorUtility.getMaxForce(this);
+        Log.v(LOG_TAG, "initShakeDetector(): mMaxForce = " + mMaxForce);
+        mCurrentForce = 0;
         mTargetForce = alarmModel.getShakePower() * MAX_FORCE / 100;
     }
 

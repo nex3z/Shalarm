@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_shake_detector_category_title"
+        android:key="pref_key_shake_detector">
+        <Preference android:title="@string/pref_shake_detector_calibrate" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="com.nex3z.shalarm"
+                android:targetClass="com.nex3z.shalarm.presentation.ui.activity.CalibrateActivity"/>
+        </Preference>
+    </PreferenceCategory>
+</PreferenceScreen>
