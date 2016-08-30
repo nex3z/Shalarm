@@ -32,6 +32,9 @@ import rx.android.schedulers.AndroidSchedulers;
 public class AlarmService extends Service {
     private static final String LOG_TAG = AlarmService.class.getSimpleName();
 
+    public static final String NEXT_ALARM_UPDATE = "com.nex3z.shalarm.presentation.alert.NEXT_ALARM_UPDATE";
+    public static final String NEXT_ALARM = "next_alarm";
+
     private AlarmModelDataMapper mMapper;
     private UseCase mGetAlarmList;
 
@@ -76,7 +79,7 @@ public class AlarmService extends Service {
 
         if (nextAlarm != null) {
             Intent intent = new Intent(context, AlertBroadcastReceiver.class);
-            intent.putExtra("alarm", nextAlarm);
+            intent.putExtra(AlertBroadcastReceiver.ALARM, nextAlarm);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
@@ -97,6 +100,17 @@ public class AlarmService extends Service {
 
             alarmManager.cancel(pendingIntent);
         }
+
+        notifyNextAlarm(nextAlarm);
+    }
+
+    private void notifyNextAlarm(AlarmModel alarmModel) {
+        Log.v(LOG_TAG, "notifyNextAlarm(): alarmModel = " + alarmModel);
+        Intent intent = new Intent(NEXT_ALARM_UPDATE);
+        if (alarmModel != null) {
+            intent.putExtra(NEXT_ALARM, alarmModel);
+        }
+        sendBroadcast(intent);
     }
 
     private AlarmModel getNextAlarm(List<AlarmModel> alarms) {

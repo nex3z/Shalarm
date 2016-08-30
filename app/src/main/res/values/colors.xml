@@ -13,5 +13,8 @@
     <color name="color_shake_power_medium">#FFC107</color>
     <color name="color_shake_power_heavy">#FF6F00</color>
 
+    <color name="color_nav_header_alarm_disabled">#607D8B</color>
+    <color name="color_nav_header_calculating_next_alarm">#2196F3</color>
+
     <color name="black_overlay">#66000000</color>
 </resources>

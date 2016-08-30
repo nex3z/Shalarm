@@ -12,6 +12,9 @@
     <string name="nav_alarm_disabled">Disabled alarms</string>
     <string name="nav_settings">Settings</string>
 
+    <string name="nav_header_next_alarm_at">Next alarm at: </string>
+    <string name="nav_header_no_enabled_alarm">Disabled</string>
+
     <string name="action_settings">Settings</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
@@ -43,6 +46,6 @@
     <string name="maximum_force">Maximum Force</string>
     <string name="text_button_calibrate">Calibrate</string>
 
-    <string name="pref_key_max_force">max_force</string>
+    <string name="pref_key_max_force" translatable="false">max_force</string>
 
 </resources>

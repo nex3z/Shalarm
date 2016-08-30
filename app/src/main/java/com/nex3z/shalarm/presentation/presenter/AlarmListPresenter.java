@@ -9,7 +9,7 @@ import com.nex3z.shalarm.domain.interactor.alarm.insert.AlarmArg;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.ui.AlarmListView;
-import com.nex3z.shalarm.presentation.utility.AlarmScheduleUtility;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class AlarmListPresenter implements Presenter {
 
     public void initialize() {
         loadAlarmList();
-        AlarmScheduleUtility.triggerAlarmService(mView.getContext());
+        AlarmUtility.triggerAlarmService(mView.getContext());
     }
 
     @SuppressWarnings("unchecked")
@@ -98,7 +98,7 @@ public class AlarmListPresenter implements Presenter {
         @Override
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): updated = " + integer);
-            AlarmScheduleUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.triggerAlarmService(mView.getContext());
         }
     }
 }

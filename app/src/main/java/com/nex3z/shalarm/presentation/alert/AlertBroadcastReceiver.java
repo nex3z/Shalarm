@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.nex3z.shalarm.presentation.alert.ui.AlertActivity;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
-import com.nex3z.shalarm.presentation.utility.AlarmScheduleUtility;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
 public class AlertBroadcastReceiver extends BroadcastReceiver {
     private static final String LOG_TAG = AlertBroadcastReceiver.class.getSimpleName();
@@ -17,7 +17,7 @@ public class AlertBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(LOG_TAG, "onReceive()");
-        AlarmScheduleUtility.triggerAlarmService(context);
+        AlarmUtility.triggerAlarmService(context);
 
         AlertWakeLock.lock(context);
 

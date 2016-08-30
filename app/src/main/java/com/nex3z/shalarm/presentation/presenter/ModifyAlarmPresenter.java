@@ -9,7 +9,7 @@ import com.nex3z.shalarm.domain.interactor.alarm.insert.AlarmArg;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.ui.AddAlarmView;
-import com.nex3z.shalarm.presentation.utility.AlarmScheduleUtility;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
 import java.util.Date;
 import java.util.Set;
@@ -113,7 +113,7 @@ public abstract class ModifyAlarmPresenter implements Presenter {
         @Override
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): deleted = " + integer);
-            AlarmScheduleUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.triggerAlarmService(mView.getContext());
         }
     }
 

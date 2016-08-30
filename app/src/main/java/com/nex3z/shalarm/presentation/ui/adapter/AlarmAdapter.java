@@ -1,7 +1,6 @@
 package com.nex3z.shalarm.presentation.ui.adapter;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.app.App;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -56,14 +56,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         holder.mTvAlarmLabel.setText(alarm.getAlarmLabel());
         holder.mTvRepeatDays.setText(getDaysDescription(alarm.getRepeatDays()));
         holder.mSwEnable.setChecked(alarm.isEnabled());
-        holder.mCardView.setCardBackgroundColor(getBackgroundColor(alarm.getShakePower()));
-
-//        holder.mSwEnable.setOnCheckedChangeListener((compoundButton, b) -> {
-//            if (mListener != null) {
-//                Log.v(LOG_TAG, "OnCheckedChangeListener(): position = " + position + ", checked = " + b);
-//                mListener.onCheckedChanged(position, b);
-//            }
-//        });
+        holder.mCardView.setCardBackgroundColor(AlarmUtility.getBackgroundColor(
+                alarm.getShakePower()));
     }
 
     @Override
@@ -110,17 +104,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         }
 
         return sb.toString();
-    }
-
-    private int getBackgroundColor(int shakePower) {
-        Context context = App.getAppContext();
-        if (shakePower < 33) {
-            return ContextCompat.getColor(context, R.color.color_shake_power_light);
-        } else if (shakePower < 66) {
-            return ContextCompat.getColor(context, R.color.color_shake_power_medium);
-        } else {
-            return ContextCompat.getColor(context, R.color.color_shake_power_heavy);
-        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

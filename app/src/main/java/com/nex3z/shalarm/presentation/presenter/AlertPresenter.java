@@ -8,7 +8,7 @@ import com.nex3z.shalarm.domain.interactor.alarm.insert.AlarmArg;
 import com.nex3z.shalarm.presentation.alert.ui.AlertView;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
-import com.nex3z.shalarm.presentation.utility.AlarmScheduleUtility;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
 public class AlertPresenter implements Presenter {
@@ -117,7 +117,7 @@ public class AlertPresenter implements Presenter {
         @Override
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): updated = " + integer);
-            AlarmScheduleUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.triggerAlarmService(mView.getContext());
         }
     }
 }

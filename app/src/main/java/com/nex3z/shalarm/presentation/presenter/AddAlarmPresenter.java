@@ -6,7 +6,7 @@ import com.nex3z.shalarm.domain.interactor.DefaultSubscriber;
 import com.nex3z.shalarm.domain.interactor.UseCase;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
-import com.nex3z.shalarm.presentation.utility.AlarmScheduleUtility;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
 public class AddAlarmPresenter extends ModifyAlarmPresenter {
     private static final String LOG_TAG = AddAlarmPresenter.class.getSimpleName();
@@ -31,7 +31,7 @@ public class AddAlarmPresenter extends ModifyAlarmPresenter {
         @Override
         public void onNext(Long aLong) {
             Log.v(LOG_TAG, "onNext(): Alarm saved, id = " + aLong);
-            AlarmScheduleUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.triggerAlarmService(mView.getContext());
         }
     }
 }
