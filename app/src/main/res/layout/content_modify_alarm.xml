@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".presentation.ui.activity.ModifyAlarmActivity"
-    tools:showIn="@layout/activity_add_alarm">
+    tools:showIn="@layout/activity_modify_alarm">
 
     <TableRow style="@style/AlarmDetailTableRow">
 
@@ -83,9 +83,22 @@
             style="@style/AlarmDetailIcon"
             android:src="@drawable/ic_shake_power_24dp" />
 
-        <TextView
-            style="@style/AlarmDetailItem"
-            android:text="@string/alarm_detail_shake_power" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content">
+
+            <TextView
+                style="@style/AlarmDetailItem"
+                android:text="@string/alarm_detail_shake_power" />
+
+            <TextView
+                android:id="@+id/tv_shake_power_description"
+                style="@style/AlarmDetailItem"/>
+
+        </LinearLayout>
+
+
 
     </TableRow>
 

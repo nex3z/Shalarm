@@ -69,6 +69,8 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     EditText mEditLabel;
     @BindView(R.id.btn_ringtone)
     Button mBtnRingtone;
+    @BindView(R.id.tv_shake_power_description)
+    TextView mTvShakePowerDescription;
 
     abstract protected ModifyAlarmPresenter getPresenter(AlarmModel alarmModel);
 
@@ -77,7 +79,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_alarm);
+        setContentView(R.layout.activity_modify_alarm);
 
         ButterKnife.bind(this);
 
@@ -256,6 +258,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     private void initView() {
         initActionBar();
         initMultiSwitchToggle();
+        initProgressBar();
     }
 
     private void initPresenter(AlarmModel alarmModel) {
@@ -282,6 +285,30 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
         mToggleWeekdays.setToggleButtonStateChangedListener((position, isEnabled) -> {
             List<Boolean> state = mToggleWeekdays.getToggleState();
             Log.v(LOG_TAG, "onToggleButtonStateChanged(): state = " + state);
+        });
+    }
+
+    private void initProgressBar() {
+        mSbShakePower.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (i < 33) {
+                    mTvShakePowerDescription.setText(getString
+                            (R.string.alarm_detail_shake_power_light));
+                } else if (i < 66) {
+                    mTvShakePowerDescription.setText(getString(
+                            R.string.alarm_detail_shake_power_medium));
+                } else {
+                    mTvShakePowerDescription.setText(getString(
+                            R.string.alarm_detail_shake_power_hard));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 

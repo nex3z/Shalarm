@@ -31,6 +31,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_add_alarm" />
+    <include layout="@layout/content_modify_alarm" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -26,7 +26,10 @@
 
     <string name="alarm_detail_repeat">Repeat</string>
     <string name="alarm_detail_vibrate">Vibrate</string>
-    <string name="alarm_detail_shake_power">Shake Power</string>
+    <string name="alarm_detail_shake_power">Shake Power:\u0020</string>
+    <string name="alarm_detail_shake_power_light">Shake me softly</string>
+    <string name="alarm_detail_shake_power_medium">Fully awake</string>
+    <string name="alarm_detail_shake_power_hard">No warranty</string>
     <string name="alarm_detail_label_hint">Add label</string>
 
     <string name="title_activity_alert">AlertActivity</string>
