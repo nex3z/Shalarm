@@ -12,6 +12,11 @@ public class GetAlarmList extends UseCase<GetAlarmListArg> {
 
     private final AlarmRepository mRepository;
 
+    public GetAlarmList(AlarmRepository repository, ThreadExecutor threadExecutor,
+                        PostExecutionThread postExecutionThread) {
+        this(new GetAlarmListArg(), repository,threadExecutor, postExecutionThread);
+    }
+
     public GetAlarmList(GetAlarmListArg arg, AlarmRepository repository,
                         ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         super(threadExecutor, postExecutionThread);
@@ -25,7 +30,11 @@ public class GetAlarmList extends UseCase<GetAlarmListArg> {
         if (mArg == null) {
             throw new IllegalArgumentException("mArg cannot be null");
         }
-        return mRepository.getAlarms(mArg.getSortOrder());
+        if (mArg.getFilter() != null) {
+            return mRepository.getAlarms(mArg.getSortOrder(), mArg.getFilter());
+        } else {
+            return mRepository.getAlarms(mArg.getSortOrder());
+        }
     }
 
 }

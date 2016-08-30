@@ -11,6 +11,8 @@ public interface AlarmRepository {
 
     Observable<List<Alarm>> getAlarms(String sortBy);
 
+    Observable<List<Alarm>> getAlarms(String sortBy, String filter);
+
     Observable<Alarm> getAlarmById(long alarmId);
 
     Observable<Long> addAlarm(Alarm alarm);

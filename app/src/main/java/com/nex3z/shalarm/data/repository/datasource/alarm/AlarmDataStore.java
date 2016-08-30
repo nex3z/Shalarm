@@ -11,6 +11,8 @@ public interface AlarmDataStore {
 
     Observable<List<AlarmEntity>> getAlarmEntityList(String sortBy);
 
+    Observable<List<AlarmEntity>> getAlarmEntityList(String sortBy, String filter);
+
     Observable<AlarmEntity> getAlarmEntityById(long alarmId);
 
     Observable<Long> insertAlarmEntity(AlarmEntity alarm);

@@ -38,8 +38,15 @@ import butterknife.ButterKnife;
 public class AlarmListFragment extends Fragment implements AlarmListView {
     private static final String LOG_TAG = AlarmListFragment.class.getSimpleName();
 
+    private static final String ALARM_FILTER = "alarm_filter";
+
+    public static final String FILTER_ENABLED_ALARMS = "filter_enabled_alarms";
+    public static final String FILTER_DISABLED_ALARMS = "filter_disabled_alarms";
+    public static final String FILTER_ALL_ALARMS = "filter_all_alarms";
+
     @BindView(R.id.rv_alarm_list) RecyclerView mRvAlarmList;
 
+    private String mFilter = FILTER_ALL_ALARMS;
     private AlarmAdapter mAlarmAdapter;
     private AlarmListPresenter mPresenter;
     private Callbacks mCallbacks = sDummyCallbacks;
@@ -52,6 +59,16 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
 
     public AlarmListFragment() {}
 
+    public static AlarmListFragment newInstanceByFilter(String filter) {
+        AlarmListFragment fragment = new AlarmListFragment();
+
+        Bundle args = new Bundle();
+        args.putString(ALARM_FILTER, filter);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +79,15 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_alarm_list, container, false);
         ButterKnife.bind(this, rootView);
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            if (arguments.containsKey(ALARM_FILTER)) {
+                mFilter = arguments.getString(ALARM_FILTER);
+                Log.v(LOG_TAG, "onCreateView(): mFilter = " + mFilter);
+            }
+        }
+
         return rootView;
     }
 
@@ -124,8 +150,24 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
     private void initPresenter() {
         AlarmRepository repository = new AlarmDataRepository(
                 new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
-        UseCase getAlarmList = new GetAlarmList(new GetAlarmListArg(), repository,
-                new JobExecutor(), new UIThread());
+
+        GetAlarmListArg arg;
+        switch (mFilter) {
+            case FILTER_ENABLED_ALARMS:
+                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_DESC,
+                        GetAlarmListArg.FILTER_ENABLED_ALARMS);
+                break;
+            case FILTER_DISABLED_ALARMS:
+                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_DESC,
+                        GetAlarmListArg.FILTER_DISABLED_ALARMS);
+                break;
+            case FILTER_ALL_ALARMS:
+            default:
+                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_DESC);
+                break;
+        }
+        UseCase getAlarmList = new GetAlarmList(arg, repository, new JobExecutor(), new UIThread());
+
         UseCase updateAlarm = new UpdateAlarm(repository, new JobExecutor(), new UIThread());
         mPresenter = new AlarmListPresenter(getAlarmList, updateAlarm,new AlarmModelDataMapper());
 

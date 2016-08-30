@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,11 +27,11 @@ public class AlarmListActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AlarmListFragment.Callbacks {
     private static final String LOG_TAG = AlarmListActivity.class.getSimpleName();
 
+    private String mFilter = AlarmListFragment.FILTER_ALL_ALARMS;
+
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.fab) FloatingActionButton mFab;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
-
-    AlarmListFragment mAlarmListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +43,9 @@ public class AlarmListActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
 
         if (savedInstanceState == null) {
-            mAlarmListFragment = new AlarmListFragment();
+            AlarmListFragment alarmListFragment = new AlarmListFragment();
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fl_alarm_list_container, mAlarmListFragment)
+                    .add(R.id.fl_alarm_list_container, alarmListFragment)
                     .commit();
         }
 
@@ -97,11 +98,14 @@ public class AlarmListActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_alarm_all) {
-
+            mFilter = AlarmListFragment.FILTER_ALL_ALARMS;
+            replaceAlarmListWithFilter(mFilter);
         } else if (id == R.id.nav_alarm_enabled) {
-
+            mFilter = AlarmListFragment.FILTER_ENABLED_ALARMS;
+            replaceAlarmListWithFilter(mFilter);
         } else if (id == R.id.nav_alarm_disabled) {
-
+            mFilter = AlarmListFragment.FILTER_DISABLED_ALARMS;
+            replaceAlarmListWithFilter(mFilter);
         } else if (id == R.id.nav_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
@@ -134,6 +138,8 @@ public class AlarmListActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 
     private void setupFloatingActionButton() {
@@ -144,5 +150,14 @@ public class AlarmListActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+    }
+
+    private void replaceAlarmListWithFilter(String filter) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        AlarmListFragment fragment = AlarmListFragment.newInstanceByFilter(filter);
+        ft.replace(R.id.fl_alarm_list_container, fragment).commit();
+
+        mFab.show();
     }
 }

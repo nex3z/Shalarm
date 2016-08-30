@@ -17,17 +17,37 @@ public class GetAlarmListArg {
     @Retention(RetentionPolicy.SOURCE)
     public @interface SortOrder {}
 
-    @SortOrder private String mSortOrder;
+    public static final String FILTER_ENABLED_ALARMS = "filter_enabled_alarms";
+    public static final String FILTER_DISABLED_ALARMS = "filter_disabled_alarms";
+    public static final String FILTER_ALL_ALARMS = "filter_all_alarms";
+
+    @StringDef({FILTER_ENABLED_ALARMS, FILTER_DISABLED_ALARMS, FILTER_ALL_ALARMS})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface Filter {}
+
+    @SortOrder private final String mSortOrder;
+
+    @Filter private final String mFilter;
 
     public GetAlarmListArg() {
         this(SORT_BY_START_DESC);
     }
 
     public GetAlarmListArg(@SortOrder String sortOrder) {
+        this(sortOrder, null);
+
+    }
+
+    public GetAlarmListArg(@SortOrder String sortOrder, @Filter String filter) {
         mSortOrder = sortOrder;
+        mFilter = filter;
     }
 
     public @SortOrder String getSortOrder() {
         return mSortOrder;
+    }
+
+    public @Filter String getFilter() {
+        return mFilter;
     }
 }

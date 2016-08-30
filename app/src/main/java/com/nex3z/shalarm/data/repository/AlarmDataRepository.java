@@ -35,6 +35,15 @@ public class AlarmDataRepository implements AlarmRepository {
     }
 
     @Override
+    public Observable<List<Alarm>> getAlarms(String sortBy, String filter) {
+        final AlarmDataStore alarmDataStore =
+                mAlarmDataStoreFactory.createContentProviderDataStore();
+        return alarmDataStore
+                .getAlarmEntityList(sortBy, filter)
+                .map(mAlarmEntityDataMapper::transform);
+    }
+
+    @Override
     public Observable<Alarm> getAlarmById(long alarmId) {
         final AlarmDataStore alarmDataStore =
                 mAlarmDataStoreFactory.createContentProviderDataStore();

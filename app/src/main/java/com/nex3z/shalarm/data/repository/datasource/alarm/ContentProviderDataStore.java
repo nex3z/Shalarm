@@ -19,6 +19,10 @@ import rx.schedulers.Schedulers;
 public class ContentProviderDataStore implements AlarmDataStore {
     private static final String LOG_TAG = ContentProviderDataStore.class.getSimpleName();
 
+    public static final String FILTER_ENABLED_ALARMS = "filter_enabled_alarms";
+    public static final String FILTER_DISABLED_ALARMS = "filter_disabled_alarms";
+    public static final String FILTER_ALL_ALARMS = "filter_all_alarms";
+
     private static final String sAlarmIdSelection = AlarmContract.AlarmEntry.TABLE_NAME + "." +
             AlarmContract.AlarmEntry._ID + " = ?";
 
@@ -42,6 +46,38 @@ public class ContentProviderDataStore implements AlarmDataStore {
                         null,
                         null,
                         null,
+                        sortBy,
+                        true)
+                .map(SqlBrite.Query::run)
+                .map(mAlarmCursorDataMapper::transformList);
+    }
+
+    @Override
+    public Observable<List<AlarmEntity>> getAlarmEntityList(String sortBy, String filter) {
+        String selection = null;
+        String[] selectionArgs = null;
+        if (filter != null) {
+            switch (filter) {
+                case FILTER_ENABLED_ALARMS:
+                    selectionArgs = new String[]{"1"};
+                    break;
+                case FILTER_DISABLED_ALARMS:
+                    selectionArgs = new String[]{"0"};
+                    break;
+                case FILTER_ALL_ALARMS:
+                default:
+                    selectionArgs = new String[]{"*"};
+                    break;
+            }
+            selection = AlarmContract.AlarmEntry.COLUMN_ENABLE + " = ?";
+        }
+
+        return mBriteContentResolver
+                .createQuery(
+                        AlarmContract.AlarmEntry.CONTENT_URI,
+                        null,
+                        selection,
+                        selectionArgs,
                         sortBy,
                         true)
                 .map(SqlBrite.Query::run)
