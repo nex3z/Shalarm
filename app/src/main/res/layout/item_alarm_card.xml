@@ -42,9 +42,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/tv_alarm_time"
+            android:layout_toLeftOf="@id/sw_enable"
             android:paddingLeft="16dp"
             android:layout_alignBaseline="@id/tv_alarm_time"
             android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="@android:color/white"
             tools:text="Wake up"/>
 

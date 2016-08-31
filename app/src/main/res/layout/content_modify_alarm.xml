@@ -134,6 +134,7 @@
             android:layout_gravity="top"
             android:layout_marginTop="16dp"
             android:background="@android:color/transparent"
+            android:maxLength="50"
             android:hint="@string/alarm_detail_label_hint"/>
 
     </TableRow>

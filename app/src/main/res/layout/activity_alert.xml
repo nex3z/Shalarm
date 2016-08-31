@@ -23,6 +23,7 @@
         android:textSize="24sp"
         android:maxLines="2"
         android:minLines="1"
+        android:ellipsize="end"
         tools:text="Wake up"/>
 
     <com.nex3z.shalarm.presentation.alert.ui.ExpandableCircleView
