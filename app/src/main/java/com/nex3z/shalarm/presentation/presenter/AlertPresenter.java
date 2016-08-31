@@ -1,5 +1,7 @@
 package com.nex3z.shalarm.presentation.presenter;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.nex3z.shalarm.domain.interactor.DefaultSubscriber;
@@ -11,8 +13,13 @@ import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
+import java.lang.ref.WeakReference;
+
 public class AlertPresenter implements Presenter {
     private static final String LOG_TAG = AlertPresenter.class.getSimpleName();
+
+    private static final int ALERT_TIMEOUT_EVENT = 1;
+    private static final long ALERT_TIMEOUT = 5 * 60 * 1000;
 
     private AlarmModel mAlarmModel;
     private UseCase mUpdateAlarm;
@@ -20,6 +27,7 @@ public class AlertPresenter implements Presenter {
     private AlertView mView;
     private float mCurrentForce;
     private float mTargetForce;
+    private final AlertHandler mHandler = new AlertHandler(this);
 
     public AlertPresenter(AlarmModel alarmModel, UseCase updateAlarm, AlarmModelDataMapper mapper) {
         mAlarmModel = alarmModel;
@@ -47,6 +55,9 @@ public class AlertPresenter implements Presenter {
         if (!mAlarmModel.isRepeated()) {
             disableAlarm();
         }
+
+        Message msg = mHandler.obtainMessage(ALERT_TIMEOUT_EVENT);
+        mHandler.sendMessageDelayed(msg, ALERT_TIMEOUT);
     }
 
     public void onAlertCanceled() {
@@ -118,6 +129,30 @@ public class AlertPresenter implements Presenter {
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): updated = " + integer);
             AlarmUtility.triggerAlarmService(mView.getContext());
+        }
+    }
+
+    private static class AlertHandler extends Handler {
+        private final WeakReference<AlertPresenter> mPresenter;
+
+        public AlertHandler(AlertPresenter presenter) {
+            mPresenter = new WeakReference<AlertPresenter>(presenter);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case ALERT_TIMEOUT_EVENT:
+                    AlertPresenter presenter = mPresenter.get();
+                    if (presenter != null) {
+                        presenter.onAlertCanceled();
+                        Log.v(LOG_TAG, "handleMessage(): cancel alarm");
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

@@ -53,9 +53,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private float mMaxForce = 0;
-    private float mCurrentForce = 0;
-    private float mTargetForce;
 
     @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
 
@@ -206,11 +203,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     private void initShakeDetector(AlarmModel alarmModel) {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        mMaxForce = SensorUtility.getMaxForce(this);
-        Log.v(LOG_TAG, "initShakeDetector(): mMaxForce = " + mMaxForce);
-        mCurrentForce = 0;
-        mTargetForce = alarmModel.getShakePower() * MAX_FORCE / 100;
     }
 
     private void initAlert() {
