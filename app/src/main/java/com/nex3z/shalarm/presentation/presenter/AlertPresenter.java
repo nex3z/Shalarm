@@ -40,6 +40,8 @@ public class AlertPresenter implements Presenter {
     }
 
     public void initialize() {
+        mView.renderAlarm(mAlarmModel);
+
         mCurrentForce = 0;
         float maxForce = SensorUtility.getMaxForce(mView.getContext());
         mTargetForce = mAlarmModel.getShakePower() * maxForce / 100;

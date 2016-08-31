@@ -16,6 +16,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nex3z.shalarm.R;
@@ -54,6 +55,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
+    @BindView(R.id.tv_label) TextView mTvLabel;
     @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
 
     @Override
@@ -104,6 +106,14 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         Log.v(LOG_TAG, "OnClick");
         mPresenter.onAlertCanceled();
         finish();
+    }
+
+    @Override
+    public void renderAlarm(AlarmModel alarmModel) {
+        String label = alarmModel.getAlarmLabel();
+        if (label != null && !label.isEmpty()) {
+            mTvLabel.setText(label);
+        }
     }
 
     @Override

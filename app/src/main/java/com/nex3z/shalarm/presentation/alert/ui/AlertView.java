@@ -3,7 +3,11 @@ package com.nex3z.shalarm.presentation.alert.ui;
 import android.content.Context;
 import android.net.Uri;
 
+import com.nex3z.shalarm.presentation.model.AlarmModel;
+
 public interface AlertView {
+
+    void renderAlarm(AlarmModel alarmModel);
 
     void setRingtone(Uri uri);
 
