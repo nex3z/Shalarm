@@ -9,6 +9,8 @@ import com.nex3z.shalarm.presentation.utility.SensorUtility;
 public class CalibratePresenter implements Presenter {
     private static final String LOG_TAG = CalibratePresenter.class.getSimpleName();
 
+    private static final float ACCEPTABLE_MINIMUM_FORCE = 0.5f;
+
     private CalibrateView mView;
     private float mMaxForce = 0;
 
@@ -29,7 +31,7 @@ public class CalibratePresenter implements Presenter {
     }
 
     public void onConfirm() {
-        if (mMaxForce < 10) {
+        if (mMaxForce < ACCEPTABLE_MINIMUM_FORCE) {
             mView.showMessage(mView.getContext().getString(R.string.invalid_calibrate_message));
         } else {
             SensorUtility.setMaxForce(mView.getContext(), mMaxForce);
