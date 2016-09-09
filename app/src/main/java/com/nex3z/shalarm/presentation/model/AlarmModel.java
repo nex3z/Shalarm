@@ -45,8 +45,15 @@ public class AlarmModel implements Parcelable {
         mId = -1;
         mIsEnabled = false;
 
+//        Calendar current = Calendar.getInstance();
+//        mStart = current.getTime();
+
         Calendar current = Calendar.getInstance();
-        mStart = current.getTime();
+        Calendar start = Calendar.getInstance();
+        start.setTime(new Date(0));
+        start.set(Calendar.HOUR_OF_DAY, current.get(Calendar.HOUR_OF_DAY));
+        start.set(Calendar.MINUTE, current.get(Calendar.MINUTE));
+        mStart = start.getTime();
 
         mIsRepeated = false;
         mRepeatDays = new HashSet<>();

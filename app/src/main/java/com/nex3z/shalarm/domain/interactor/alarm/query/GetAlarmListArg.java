@@ -30,7 +30,7 @@ public class GetAlarmListArg {
     @Filter private final String mFilter;
 
     public GetAlarmListArg() {
-        this(SORT_BY_START_DESC);
+        this(SORT_BY_START_ASC);
     }
 
     public GetAlarmListArg(@SortOrder String sortOrder) {

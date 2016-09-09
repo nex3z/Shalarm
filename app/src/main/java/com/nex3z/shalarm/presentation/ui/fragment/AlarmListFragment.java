@@ -154,16 +154,16 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
         GetAlarmListArg arg;
         switch (mFilter) {
             case FILTER_ENABLED_ALARMS:
-                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_DESC,
+                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC,
                         GetAlarmListArg.FILTER_ENABLED_ALARMS);
                 break;
             case FILTER_DISABLED_ALARMS:
-                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_DESC,
+                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC,
                         GetAlarmListArg.FILTER_DISABLED_ALARMS);
                 break;
             case FILTER_ALL_ALARMS:
             default:
-                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_DESC);
+                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC);
                 break;
         }
         UseCase getAlarmList = new GetAlarmList(arg, repository, new JobExecutor(), new UIThread());
