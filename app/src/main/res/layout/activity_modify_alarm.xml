@@ -26,11 +26,18 @@
             android:layout_gravity="center"
             android:paddingBottom="8dp"
             android:textSize="56sp"
-            android:text="12:30"
             tools:text="12:30"/>
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_modify_alarm" />
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <include layout="@layout/content_modify_alarm"/>
+
+    </android.support.v4.widget.NestedScrollView>
+
 
 </android.support.design.widget.CoordinatorLayout>

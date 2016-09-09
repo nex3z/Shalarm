@@ -106,7 +106,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         return sb.toString();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_alarm_time) public TextView mTvAlarmTime;
         @BindView(R.id.tv_alarm_label) public TextView mTvAlarmLabel;
         @BindView(R.id.tv_repeat_days) public TextView mTvRepeatDays;
