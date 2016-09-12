@@ -32,7 +32,10 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:innerColor="@color/colorPrimary"
-        app:expandAnimationDuration="150">
+        app:expandAnimationDuration="150"
+        app:showProgressText="true"
+        app:progressTextSize="32sp"
+        app:progressTextSuffix="%">
 
     </com.nex3z.shalarm.presentation.alert.ui.ExpandableCircleView>
 

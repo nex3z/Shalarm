@@ -1,7 +1,6 @@
 package com.nex3z.shalarm.presentation.ui.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -26,6 +25,7 @@ import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.ModifyAlarmPresenter;
 import com.nex3z.shalarm.presentation.ui.AddAlarmView;
+import com.nex3z.shalarm.presentation.ui.misc.MultiSelectToggleGroup;
 import com.nex3z.shalarm.presentation.ui.misc.ToggleButtonGroup;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -60,7 +59,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.toggle_weekdays)
-    ToggleButtonGroup mToggleWeekdays;
+    MultiSelectToggleGroup mToggleWeekdays;
     @BindView(R.id.tv_alarm_time)
     TextView mTvAlarmTime;
     @BindView(R.id.sw_vibrate)
@@ -294,10 +293,12 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     private void initMultiSwitchToggle() {
         String[] weekdays = getResources().getStringArray(R.array.weekdays);
         ArrayList<String> weekdaysList = new ArrayList<>(Arrays.asList(weekdays));
-        mToggleWeekdays.setLabels(weekdaysList);
-        mToggleWeekdays.setToggleButtonStateChangedListener((position, isEnabled) -> {
-            List<Boolean> state = mToggleWeekdays.getToggleState();
-            Log.v(LOG_TAG, "onToggleButtonStateChanged(): state = " + state);
+        mToggleWeekdays.setOnCheckedStateChangeListener(new ToggleButtonGroup.OnCheckedStateChangeListener() {
+            @Override
+            public void onCheckedStateChange(int position, boolean isChecked) {
+                Set<Integer> positions = mToggleWeekdays.getCheckedPositions();
+                Log.v(LOG_TAG, "onToggleButtonStateChanged(): positions = " + positions);
+            }
         });
     }
 
@@ -345,16 +346,12 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     public void requestConfirmDelete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setMessage(getString(R.string.delete_alarm_confirm_message));
-        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                mPresenter.onDelete();
-                dialog.dismiss();
-            }
+        builder.setPositiveButton(android.R.string.yes, (dialog, id) -> {
+            mPresenter.onDelete();
+            dialog.dismiss();
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
+        builder.setNegativeButton(android.R.string.cancel, (dialog, id) -> {
+            dialog.dismiss();
         });
         builder.show();
     }

@@ -33,6 +33,7 @@ import com.nex3z.shalarm.presentation.alert.AlertWakeLock;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.AlertPresenter;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
 import butterknife.BindView;
@@ -110,6 +111,8 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     @Override
     public void renderAlarm(AlarmModel alarmModel) {
+        mCircle.setInnerColor(AlarmUtility.getBackgroundColor(alarmModel.getShakePower()));
+
         String label = alarmModel.getAlarmLabel();
         if (label != null && !label.isEmpty()) {
             mTvLabel.setText(label);
@@ -191,7 +194,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     @Override
     public void renderForce(float current, float target) {
-        mCircle.expand(current / target);
+        mCircle.setProgress((int)(current / target * 100), true);
     }
 
     @Override

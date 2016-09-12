@@ -1,19 +1,16 @@
 package com.nex3z.shalarm.presentation.ui.misc;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.support.v4.graphics.drawable.DrawableCompat;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.nex3z.shalarm.R;
 
@@ -22,31 +19,44 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ToggleButtonGroup extends LinearLayout implements View.OnClickListener {
+public abstract class ToggleButtonGroup extends LinearLayout implements View.OnClickListener {
     private static final String LOG_TAG = ToggleButtonGroup.class.getSimpleName();
 
-    private static final float DEFAULT_TEXT_SIZE = 50;
-    private static final float DEFAULT_BUTTON_SIZE = 120;
-    private static final int DEFAULT_BACKGROUND_COLOR = Color.BLUE;
-    private static final int DEFAULT_TEXT_COLOR = Color.BLACK;
+    private static final int DEFAULT_CHECKED_DRAWABLE_ID = R.drawable.ic_circle_48dp;
+    private static final float DEFAULT_TEXT_SIZE = 16;
+    private static final long DEFAULT_ANIMATION_DURATION = 150;
+    private static final float DEFAULT_SPACING = 0;
+    private static final float DEFAULT_BUTTON_HEIGHT = -2;
+    private static final float DEFAULT_BUTTON_WIDTH = -2;
+    private static final int DEFAULT_CHECKED_TEXT_COLOR = Color.BLACK;
+    private static final int DEFAULT_UNCHECKED_TEXT_COLOR = Color.BLACK;
 
     private Context mContext;
-    private float mButtonSize;
-    private int mBackgroundColor;
-    private int mTextColor;
-    private int mTextSize;
+    private LayoutInflater mInflater;
+    private LinearLayout mContainer;
+
+    private Drawable mCheckedBackground;
+    private float mButtonHeight;
+    private float mButtonWidth;
+    private int mCheckedTextColor;
+    private int mUncheckedTextColor;
+    private float mTextSize;
+    private float mSpacing;
+    private boolean mIsSpacingSet;
+    private boolean mIsAnimationEnabled;
+    private long mAnimationDuration = DEFAULT_ANIMATION_DURATION;
     private String mTextButton1;
     private String mTextButton2;
-    private ArrayList<String> mLabels;
-    private ArrayList<ToggleButton> mButtons;
+    private CharSequence[] mText;
+    protected ArrayList<ToggleButton> mButtons;
 
-    private LayoutInflater mInflater;
-    private LinearLayout mToggleButtonContainer;
-    private ToggleButtonStateChangedListener mToggleButtonStateChangedListener;
+    protected OnCheckedStateChangeListener mListener;
 
-    public interface ToggleButtonStateChangedListener {
-        void onToggleButtonStateChanged(int position, boolean isEnabled);
+    public interface OnCheckedStateChangeListener {
+        void onCheckedStateChange(int position, boolean isChecked);
     }
+
+    protected abstract void onToggleButtonClicked(int position);
 
     public ToggleButtonGroup(Context context) {
         this(context, null);
@@ -64,27 +74,51 @@ public class ToggleButtonGroup extends LinearLayout implements View.OnClickListe
 
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             mInflater.inflate(R.layout.toggle_button_group, this, true);
-            mToggleButtonContainer = (LinearLayout) findViewById(R.id.toggle_button_container);
+            mContainer = (LinearLayout) findViewById(R.id.toggle_button_container);
 
-            mTextSize = a.getDimensionPixelSize(R.styleable.ToggleButtonOptions_android_textSize, (int) dp2px(context, DEFAULT_TEXT_SIZE));
-            mButtonSize = a.getDimension(R.styleable.ToggleButtonOptions_buttonSize, dp2px(getContext(), DEFAULT_BUTTON_SIZE));
-            mBackgroundColor = a.getColor(R.styleable.ToggleButtonOptions_backgroundColor, DEFAULT_BACKGROUND_COLOR);
-            mTextColor = a.getColor(R.styleable.ToggleButtonOptions_textColor, DEFAULT_TEXT_COLOR);
+            mCheckedBackground = a.getDrawable(R.styleable.ToggleButtonOptions_checkedBackground);
+            if (mCheckedBackground == null) {
+                mCheckedBackground = ContextCompat.getDrawable(context, DEFAULT_CHECKED_DRAWABLE_ID);
+            }
+
+            mButtonHeight = a.getDimension(R.styleable.ToggleButtonOptions_buttonHeight, dpToPx(DEFAULT_BUTTON_HEIGHT));
+            mButtonWidth = a.getDimension(R.styleable.ToggleButtonOptions_buttonWidth, dpToPx(DEFAULT_BUTTON_WIDTH));
+
+            mTextSize = a.getDimensionPixelSize(R.styleable.ToggleButtonOptions_android_textSize, (int)dpToPx(DEFAULT_TEXT_SIZE));
+
+            mCheckedTextColor = a.getColor(R.styleable.ToggleButtonOptions_checkedTextColor, DEFAULT_CHECKED_TEXT_COLOR);
+            mUncheckedTextColor = a.getColor(R.styleable.ToggleButtonOptions_uncheckedTextColor, DEFAULT_UNCHECKED_TEXT_COLOR);
+
+            mIsSpacingSet = a.hasValue(R.styleable.ToggleButtonOptions_spacing);
+            mSpacing = a.getDimension(R.styleable.ToggleButtonOptions_spacing, dpToPx(DEFAULT_SPACING));
+
+            mIsAnimationEnabled = a.getBoolean(R.styleable.ToggleButtonOptions_animationEnabled, false);
 
             mTextButton1 = a.getString(R.styleable.ToggleButtonOptions_textButton1);
             mTextButton2 = a.getString(R.styleable.ToggleButtonOptions_textButton2);
 
-            Log.v(LOG_TAG, "ToggleButtonGroup(): mTextSize = " + mTextSize
-                    + ", mButtonSize = " + mButtonSize
-                    + ", mBackgroundColor = " + mBackgroundColor + ", mTextColor = " + mTextColor);
+            mText =  a.getTextArray(R.styleable.ToggleButtonOptions_textButtons);
 
-            mLabels = new ArrayList<>();
             mButtons = new ArrayList<>();
-            if (mTextButton1 != null && !mTextButton1.isEmpty()
-                    && mTextButton2 != null && !mTextButton2.isEmpty()) {
-                mLabels.add(mTextButton1);
-                mLabels.add(mTextButton2);
-                buildToggleButtons();
+
+            List<String> attrLabels = new ArrayList<>();
+            if (mText != null) {
+                if (mText.length == 0) {
+                    Log.e(LOG_TAG, "The array read from textButtons is empty.");
+                }
+                for (CharSequence cs : mText) {
+                    attrLabels.add(cs.toString());
+                }
+            } else {
+                if (mTextButton1 != null && !mTextButton1.isEmpty()) {
+                    attrLabels.add(mTextButton1);
+                }
+                if (mTextButton2 != null && !mTextButton2.isEmpty()) {
+                    attrLabels.add(mTextButton2);
+                }
+            }
+            if (!attrLabels.isEmpty()) {
+                setButtons(attrLabels);
             }
 
         } finally {
@@ -94,31 +128,76 @@ public class ToggleButtonGroup extends LinearLayout implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        int position = mToggleButtonContainer.indexOfChild(view);
-        ToggleButton button = mButtons.get(position);
-        boolean isEnabled = button.changeCheckedState();
-        if (mToggleButtonStateChangedListener != null) {
-            mToggleButtonStateChangedListener.onToggleButtonStateChanged(position, isEnabled);
+        int position = mContainer.indexOfChild(view);
+        onToggleButtonClicked(position);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if ((MeasureSpec.getMode(widthMeasureSpec) != MeasureSpec.AT_MOST) && (!mIsSpacingSet)) {
+            int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+            int buttonWidth = mButtons.get(0).getView().getLayoutParams().width;
+            int count = mContainer.getChildCount();
+            float spacing = (parentWidth - (count * buttonWidth)) / (count - 1);
+
+            for (int i = 0; i < mContainer.getChildCount() - 1; i++) {
+                View view = mContainer.getChildAt(i);
+                LayoutParams params = (LayoutParams) view.getLayoutParams();
+                params.setMargins(0, 0, (int) spacing, 0);
+            }
+        }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    /**
+     * Registers a callback to be invoked when any button's checked state is changed.
+     *
+     * @param listener The callback that will run
+     */
+    public void setOnCheckedStateChangeListener(OnCheckedStateChangeListener listener) {
+        mListener = listener;
+    }
+
+    /**
+     * Sets buttons to the group with the given list of text.
+     *
+     * @param text The list of text that will be displayed on the buttons
+     */
+    public void setButtons(List<String> text) {
+        clearButtons();
+
+        int count = text != null ? text.size() : 0;
+        if (count != 0) {
+            for (int i = 0; i < count - 1; i++) {
+                addButton(text.get(i), true);
+            }
+            addButton(text.get(count - 1), false);
         }
     }
 
-    public boolean getToggleStateAt(int position) {
-        ToggleButton button = mButtons.get(position);
-        if (button != null) {
-            return button.isChecked();
-        } else {
-            throw new IllegalArgumentException("Toggle button not found.");
+    /**
+     * Clears all buttons in the group.
+     */
+    public void clearButtons() {
+        mContainer.removeAllViews();
+        mButtons.clear();
+    }
+
+    /**
+     * Unchecks all buttons in the group.
+     */
+    public void uncheckAll() {
+        for (ToggleButton button : mButtons) {
+            button.setChecked(false);
         }
     }
 
-    public List<Boolean> getToggleState() {
-        List<Boolean> states = new ArrayList<>();
-        for(ToggleButton button : mButtons) {
-            states.add(button.isChecked());
-        }
-        return states;
-    }
-
+    /**
+     * Returns the positions of all checked buttons.
+     *
+     * @return The positions of all checked buttons.
+     */
     public Set<Integer> getCheckedPositions() {
         Set<Integer> positions = new HashSet<>();
         for (int i = 0; i < mButtons.size(); i++) {
@@ -129,90 +208,202 @@ public class ToggleButtonGroup extends LinearLayout implements View.OnClickListe
         return positions;
     }
 
-    public void setLabels(ArrayList<String> labels){
-        if(labels == null || labels.isEmpty())
-            throw new RuntimeException("The list cannot be empty.");
-        mLabels = labels;
-        mToggleButtonContainer.removeAllViews();
-        mButtons.clear();
-        buildToggleButtons();
-    }
-
-    public void setCheckedPositions(Set<Integer> positions) {
-        uncheckAll();
-        for (Integer i : positions) {
-            if (i >= 0 && i < mButtons.size()) {
-                mButtons.get(i).setChecked(true);
-            }
+    /**
+     * Changes the checked state of the button at specified position.
+     *
+     * @param position the position of the button
+     * @param isChecked true to check the button, false to uncheck it
+     */
+    public void setCheckedAt(int position, boolean isChecked) {
+        ToggleButton button = mButtons.get(position);
+        if (button != null) {
+            button.setChecked(isChecked);
         }
     }
 
-    public void setToggleButtonStateChangedListener(ToggleButtonStateChangedListener listener) {
-        mToggleButtonStateChangedListener = listener;
+    /**
+     * Changes the checked state of the button at specified position, optionally animating the
+     * check and uncheck operation.
+     *
+     * @param position the position of the button
+     * @param isChecked true to check the button, false to uncheck it
+     * @param animate true to animate between the checked and unchecked state or false to not
+     *                animate
+     */
+    public void setCheckedAt(int position, boolean isChecked, boolean animate) {
+        ToggleButton button = mButtons.get(position);
+        if (button != null) {
+            button.setChecked(isChecked, animate);
+        }
     }
 
-    public float getButtonSize() {
-        return mButtonSize;
+    /**
+     * Gets the text color for the button when checked.
+     *
+     * @return The text color for checked state
+     */
+    public int getCheckedTextColor() {
+        return mCheckedTextColor;
     }
 
-    public void setButtonSize(float buttonSize) {
-        mButtonSize = buttonSize;
+    /**
+     * Sets the text color for the button when checked.
+     *
+     * @param checkedTextColor The text color for checked state
+     */
+    public void setCheckedTextColor(int checkedTextColor) {
+        mCheckedTextColor = checkedTextColor;
         for (ToggleButton button : mButtons) {
-            View view = button.getView();
-            view.setLayoutParams(new LayoutParams((int) mButtonSize, (int) mButtonSize));
+            button.setCheckedTextColor(checkedTextColor);
         }
-        invalidate();
     }
 
-    public void uncheckAll() {
+    /**
+     * Gets the text color for the button when unchecked.
+     *
+     * @return The text color for unchecked state
+     */
+    public int getUncheckedTextColor() {
+        return mUncheckedTextColor;
+    }
+
+    /**
+     * Sets the text color for the button when unchecked.
+     *
+     * @param uncheckedTextColor The text color for unchecked state
+     */
+    public void setUncheckedTextColor(int uncheckedTextColor) {
+        mUncheckedTextColor = uncheckedTextColor;
         for (ToggleButton button : mButtons) {
-            button.setChecked(false);
+            button.setUncheckedTextColor(uncheckedTextColor);
         }
     }
 
-    private void buildToggleButtons() {
-        for(String label : mLabels)
-            addToggleButton(label);
+    /**
+     * Returns the text size of the button in pixels.
+     * @return The text size in pixels.
+     */
+    public float getTextSize() {
+        return mTextSize;
     }
 
-    private void addToggleButton(String label) {
-        ToggleButton toggleButton = new ToggleButton(mContext);
-
-        TextView textView = toggleButton.getText();
-        textView.setText(label);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
-        textView.setTextColor(mTextColor);
-
-        ImageView imageView = toggleButton.getBackground();
-        DrawableCompat.setTint(imageView.getDrawable(), mBackgroundColor);
-
-        View view = toggleButton.getView();
-        view.setLayoutParams(new LayoutParams((int) mButtonSize, (int) mButtonSize));
-        view.setOnClickListener(this);
-
-        mButtons.add(toggleButton);
-        mToggleButtonContainer.addView(toggleButton.getView());
-
-        uncheck(mToggleButtonContainer.getChildCount() - 1);
-
+    /**
+     * Sets the default text size to the given value, interpreted as "scaled pixel" units.
+     *
+     * @param size The scaled pixel size.
+     */
+    public void setTextSize(float size) {
+        mTextSize = dpToPx(size);
+        for (ToggleButton button : mButtons) {
+            button.setTextSizePx(mTextSize);
+        }
     }
 
-    private void uncheck(int position) {
-        getToggleButtonAt(position).setChecked(false);
+    /**
+     * Gets the spacing between neighboring buttons in pixels.
+     *
+     * @return The spacing between neighboring buttons in pixels
+     */
+    public float getSpacing() {
+        return mSpacing;
     }
 
-    private void check(int position) {
-        getToggleButtonAt(position).setChecked(true);
+    /**
+     * Sets the spacing between neighboring buttons in pixels.
+     *
+     * @param spacing The spacing between neighboring buttons in pixels
+     */
+    public void setSpacing(float spacing) {
+        mSpacing = spacing;
+
+        // Do not add spacing after the last button.
+        for (int i = 0; i < mContainer.getChildCount() - 1; i++) {
+            View view = mContainer.getChildAt(i);
+            LayoutParams params = (LayoutParams) view.getLayoutParams();
+            params.setMargins(0, 0, (int) mSpacing, 0);
+        }
     }
 
-    private ToggleButton getToggleButtonAt(int position) {
-        return mButtons.get(position);
+    /**
+     * Returns whether the animation for toggling button is enabled.
+     *
+     * @return Whether the animation for toggling button is enabled
+     */
+    public boolean isAnimationEnabled() {
+        return mIsAnimationEnabled;
     }
 
-    private float dp2px(Context context, float dp){
-        Resources resources = context.getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        return dp * (metrics.densityDpi / 160f);
+    /**
+     * Sets whether the animation for toggling button is enabled. The default is false, meaning that
+     * the animation is disabled.
+     *
+     * @param isEnabled Whether the animation for toggling button is enabled
+     */
+    public void setAnimationEnabled(boolean isEnabled) {
+        mIsAnimationEnabled = isEnabled;
+    }
+
+    /**
+     * Returns the duration of the animation for toggling button.
+     *
+     * @return The duration of the animation in milliseconds.
+     */
+    public long getAnimationDuration() {
+        return mAnimationDuration;
+    }
+
+    /**
+     * Sets the duration of the animation for toggling button in milliseconds. The default is 150
+     * milliseconds.
+     *
+     * @param durationMillis The duration of the animation in milliseconds
+     */
+    public void setAnimationDuration(long durationMillis) {
+        if (durationMillis < 0) {
+            throw new IllegalArgumentException("The duration must be greater than 0");
+        }
+        mAnimationDuration = durationMillis;
+        for (ToggleButton button : mButtons) {
+            button.setAnimationDuration(durationMillis);
+        }
+    }
+
+    private void addButton(String text, boolean needSpacing) {
+        ToggleButton button = new ToggleButton(mContext);
+
+        button.setText(text);
+        button.setTextSizePx(mTextSize);
+        button.setCheckedTextColor(mCheckedTextColor);
+        button.setUncheckedTextColor(mUncheckedTextColor);
+        button.setAnimationDuration(mAnimationDuration);
+
+        button.setCheckedBackgroundDrawable(mCheckedBackground);
+
+        button.setOnClickListener(this);
+
+        mButtons.add(button);
+
+        LayoutParams params = buildLayoutParams(needSpacing);
+
+        mContainer.addView(button.getView(), params);
+    }
+
+    private LayoutParams buildLayoutParams(boolean needSpacing) {
+        LayoutParams params;
+
+        mButtonHeight = mButtonHeight < 0 ? mCheckedBackground.getIntrinsicHeight() : mButtonHeight;
+        mButtonWidth = mButtonWidth < 0 ? mCheckedBackground.getIntrinsicWidth() : mButtonWidth;
+        params = new LayoutParams((int) mButtonWidth, (int) mButtonHeight);
+
+        if (needSpacing) {
+            params.setMargins(0, 0, (int) mSpacing, 0);
+        }
+        return params;
+    }
+
+    private float dpToPx(float dp){
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
 }

@@ -28,11 +28,19 @@
             android:layout_width="24dp"
             android:layout_height="24dp"/>
 
-        <com.nex3z.shalarm.presentation.ui.misc.ToggleButtonGroup
+        <com.nex3z.shalarm.presentation.ui.misc.MultiSelectToggleGroup
             android:id="@+id/toggle_weekdays"
-            app:backgroundColor="@color/colorAccent"
-            app:buttonSize="42dp"
-            android:textSize="18sp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            app:buttonWidth="42dp"
+            app:buttonHeight="42dp"
+            app:textButtons="@array/weekdays"
+            app:uncheckedTextColor="@android:color/black"
+            app:checkedTextColor="@android:color/white"
+            app:checkedBackground="@drawable/ic_circle_48dp"
+            app:spacing="0dp"
+            app:animationEnabled="true"/>
 
     </TableRow>
 

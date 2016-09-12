@@ -6,32 +6,48 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.nex3z.shalarm.R;
 
 public class ExpandableCircleView extends View {
+    private static final String LOG_TAG = ExpandableCircleView.class.getSimpleName();
 
     private static final int DEFAULT_OUTER_COLOR = Color.BLACK;
     private static final int DEFAULT_INNER_COLOR = Color.BLUE;
     private static final int DEFAULT_HEIGHT = 200;
     private static final int DEFAULT_WIDTH = 200;
     private static final int DEFAULT_EXPAND_ANIMATION_DURATION = 100;
-    private static final float DEFAULT_INNER_CIRCLE_PROPORTION = 0;
+    private static final boolean DEFAULT_SHOW_PROGRESS = false;
+    private static final float DEFAULT_PROGRESS_TEXT_SIZE_DP = 32;
+    private static final int DEFAULT_PROGRESS_TEXT_COLOR = Color.BLACK;
+
+    private static final int DEFAULT_MAX = 100;
 
     private static final String SUPER_STATE_KEY = "super_state";
     private static final String OUTER_COLOR_KEY = "outer_color";
     private static final String INNER_COLOR_KEY = "inner_color";
 
-    private int mOuterColor = DEFAULT_OUTER_COLOR;
-    private int mInnerColor = DEFAULT_INNER_COLOR;
-    private int mExpandAnimationDuration = DEFAULT_EXPAND_ANIMATION_DURATION;
-    private float mProportion = 0;
+    private int mOuterColor;
+    private int mInnerColor;
+    private int mExpandAnimationDuration;
+    private boolean mShowProgressText;
+    private float mProgressTextSize;
+    private int mProgressTextColor;
+    private String mProgressTextSuffix;
+
+    private int mMax;
+    private int mProgress = 0;
+
     private Paint mOuterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mInnerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint mProgressTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Rect mProgressTextRect = new Rect();
     private ObjectAnimator mExpandAnimator;
 
     public ExpandableCircleView(Context context) {
@@ -57,11 +73,19 @@ public class ExpandableCircleView extends View {
                     DEFAULT_OUTER_COLOR);
             mInnerColor = a.getColor(R.styleable.ExpandableCircleView_innerColor,
                     DEFAULT_INNER_COLOR);
-            mProportion = a.getFloat(R.styleable.ExpandableCircleView_proportion,
-                    DEFAULT_INNER_CIRCLE_PROPORTION);
+
+            mMax = a.getInt(R.styleable.ExpandableCircleView_max, DEFAULT_MAX);
             mExpandAnimationDuration = a.getInt(
                     R.styleable.ExpandableCircleView_expandAnimationDuration,
                     DEFAULT_EXPAND_ANIMATION_DURATION);
+            mShowProgressText = a.getBoolean(R.styleable.ExpandableCircleView_showProgressText,
+                    DEFAULT_SHOW_PROGRESS);
+            mProgressTextSize = a.getDimensionPixelSize(
+                    R.styleable.ExpandableCircleView_progressTextSize,
+                    (int)dpToPx(DEFAULT_PROGRESS_TEXT_SIZE_DP));
+            mProgressTextColor = a.getColor(R.styleable.ExpandableCircleView_progressTextColor,
+                    DEFAULT_PROGRESS_TEXT_COLOR);
+            mProgressTextSuffix = a.getString(R.styleable.ExpandableCircleView_progressTextSuffix);
         } finally {
             a.recycle();
         }
@@ -72,9 +96,13 @@ public class ExpandableCircleView extends View {
     private void init() {
         mOuterPaint.setColor(mOuterColor);
         mOuterPaint.setStyle(Paint.Style.STROKE);
+
         mInnerPaint.setColor(mInnerColor);
 
-        mExpandAnimator = ObjectAnimator.ofFloat(this, "Proportion", 0);
+        mProgressTextPaint.setColor(mProgressTextColor);
+        mProgressTextPaint.setTextSize(mProgressTextSize);
+
+        mExpandAnimator = ObjectAnimator.ofInt(this, "Progress", 0);
     }
 
     @Override
@@ -113,8 +141,19 @@ public class ExpandableCircleView extends View {
         float cx = paddingLeft + borderRadius;
         float cy = paddingTop + borderRadius;
 
+        float proportion = (float)mProgress / mMax;
         canvas.drawCircle(cx, cy, borderRadius, mOuterPaint);
-        canvas.drawCircle(cx, cy, borderRadius * mProportion, mInnerPaint);
+        canvas.drawCircle(cx, cy, borderRadius * proportion, mInnerPaint);
+
+        if (mShowProgressText) {
+            String progress = String.valueOf(mProgress);
+            if (mProgressTextSuffix != null) {
+                progress += mProgressTextSuffix;
+            }
+            mProgressTextPaint.getTextBounds(progress, 0, progress.length(), mProgressTextRect);
+            canvas.drawText(progress, cx - mProgressTextRect.width() / 2,
+                    cy + mProgressTextRect.height() / 2, mProgressTextPaint);
+        }
     }
 
     @Override
@@ -141,36 +180,144 @@ public class ExpandableCircleView extends View {
     }
 
     /**
-     * Expand inner circle with animation.
+     * Gets the current progress.
      *
-     * @param proportion the proportion of the inner circle to expand
+     * @return the current progress, between 0 and getMax()
      */
-    public void expand(float proportion) {
-        proportion = proportion > 1 ? 1 : proportion;
+    public int getProgress() {
+        return mProgress;
+    }
 
-        if (mExpandAnimator.isRunning()) {
-            mExpandAnimator.cancel();
+    /**
+     * Sets the current progress to the specified value and immediately update the proportion of
+     * the inner circle.
+     *
+     * @param progress the new progress value, between 0 and getMax()
+     */
+    public void setProgress(int progress) {
+        if (progress > getMax()) {
+            mProgress = getMax();
+        } else {
+            mProgress = progress;
         }
-        mExpandAnimator.setFloatValues(proportion);
-        mExpandAnimator.setDuration(mExpandAnimationDuration).start();
+        invalidate();
     }
 
     /**
-     * Gets the proportion of the inner circle.
+     * Sets the current progress to the specified value, optionally animating the proportion of the
+     * inner circle between the current and target values.
      *
-     * @return the proportion of the inner circle
+     * @param progress the new progress value, between 0 and getMax()
+     * @param animate true to animate between the current and target values or false to not animate
      */
-    public float getProportion() {
-        return mProportion;
+    public void setProgress(int progress, boolean animate) {
+        if (!animate) {
+            setProgress(progress);
+        } else {
+            int target = progress > getMax() ? getMax() : progress;
+            if (mExpandAnimator.isRunning()) {
+                mExpandAnimator.cancel();
+            }
+            mExpandAnimator.setIntValues(target);
+            mExpandAnimator.setDuration(mExpandAnimationDuration).start();
+        }
     }
 
     /**
-     * Expands inner circle to specific proportion without animation.
+     * Return the upper limit of this progress bar's range.
      *
-     * @param proportion the proportion of the inner circle to expand
+     * @return the upper limit of this progress bar's range
      */
-    public void setProportion(float proportion) {
-        mProportion = proportion;
+    public int getMax() {
+        return mMax;
+    }
+
+    /**
+     * Set the range of the progress bar to 0...max.
+     *
+     * @param max the upper range of this progress bar
+     */
+    public void setMax(int max) {
+        mMax = max;
+        invalidate();
+    }
+
+    /**
+     * Gets the color of the progress text.
+     *
+     * @return the color of the progress text
+     */
+    public int getProgressTextColor() {
+        return mProgressTextColor;
+    }
+
+    /**
+     * Sets color of the progress text.
+     *
+     * @param progressTextColor color of the progress text
+     */
+    public void setProgressTextColor(int progressTextColor) {
+        mProgressTextColor = progressTextColor;
+        mProgressTextPaint.setColor(mProgressTextColor);
+        invalidate();
+    }
+
+    /**
+     * Gets the size (in pixels) of progress text.
+     *
+     * @return the size (in pixels) of progress text
+     */
+    public float getProgressTextSize() {
+        return mProgressTextSize;
+    }
+
+    /**
+     * Sets the size (in pixels) of progress text.
+     *
+     * @param progressTextSize the size (in pixels) of progress text
+     */
+    public void setProgressTextSize(float progressTextSize) {
+        mProgressTextSize = progressTextSize;
+        mProgressTextPaint.setTextSize(mProgressTextSize);
+        invalidate();
+    }
+
+    /**
+     * Returns whether the progress text is shown in the center of the circle. The default is false.
+     *
+     * @return  whether the progress text is shown in the center of the circle
+     */
+    public boolean getShowProgressText() {
+        return mShowProgressText;
+    }
+
+    /**
+     * Sets whether the progress text is shown in the center of the circle.
+     *
+     * @param showProgressText set true to show progress text, false to hide the text
+     */
+    public void setShowProgressText(boolean showProgressText) {
+        mShowProgressText = showProgressText;
+        invalidate();
+    }
+
+    /**
+     * Gets the suffix string to be appended to the progress text. Default is null which appends
+     * nothing.
+     *
+     * @return the suffix string to be appended to the progress text
+     */
+    public String getProgressTextSuffix() {
+        return mProgressTextSuffix;
+    }
+
+    /**
+     * Sets the suffix string to be appended to the progress text.
+     *
+     * @param progressTextSuffix the suffix string to be appended to the progress text
+     */
+    public void setProgressTextSuffix(String progressTextSuffix) {
+        mProgressTextSuffix = progressTextSuffix;
         invalidate();
     }
 
@@ -186,7 +333,7 @@ public class ExpandableCircleView extends View {
     /**
      * Changes the color of outer circle.
      *
-     * @param color the color of the outer circle.
+     * @param color the color of the outer circle
      */
     public void setOuterColor(int color) {
         mOuterColor = color;
@@ -194,7 +341,7 @@ public class ExpandableCircleView extends View {
     }
 
     /**
-     * Get the color of inner circle.
+     * Gets the color of inner circle.
      *
      * @return the color of the inner circle
      */
@@ -228,6 +375,11 @@ public class ExpandableCircleView extends View {
      */
     public void setExpandAnimationDuration(int duration) {
         mExpandAnimationDuration = duration;
+    }
+
+    private float dpToPx(float dp){
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
 }
