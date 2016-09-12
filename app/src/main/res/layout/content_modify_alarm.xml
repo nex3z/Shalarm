@@ -101,8 +101,6 @@
 
         </LinearLayout>
 
-
-
     </TableRow>
 
     <TableRow style="@style/AlarmDetailTableRow">
@@ -138,7 +136,8 @@
             android:layout_marginTop="16dp"
             android:background="@android:color/transparent"
             android:maxLength="50"
-            android:hint="@string/alarm_detail_label_hint"/>
+            android:hint="@string/alarm_detail_label_hint"
+            android:saveEnabled="false"/>
 
     </TableRow>
 

@@ -50,6 +50,8 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     private static final int PICK_RINGTONE_REQUEST = 1;
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
 
+    private static final String STATE_ALARM_MODEL = "state_alarm";
+
     public static final String ALARM_INFO = "alarm_info";
 
     private ModifyAlarmPresenter mPresenter;
@@ -85,13 +87,22 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
 
         setSupportActionBar(mToolbar);
 
+        AlarmModel alarmModel = null;
         if (savedInstanceState == null) {
-            AlarmModel alarmModel = getIntent().getParcelableExtra(ALARM_INFO);
+            alarmModel = getIntent().getParcelableExtra(ALARM_INFO);
             Log.v(LOG_TAG, "onCreate(): savedInstanceState == null, alarmModel = " + alarmModel);
-            init(alarmModel);
         } else {
-            init(null);
+            alarmModel = savedInstanceState.getParcelable(STATE_ALARM_MODEL);
+            Log.v(LOG_TAG, "onCreate(): recovered from savedInstanceState, alarmModel = " + alarmModel);
         }
+        init(alarmModel);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.v(LOG_TAG, "onSaveInstanceState(): mPresenter.getCurrentAlarmModel() = " + mPresenter.getCurrentAlarmModel());
+        outState.putParcelable(STATE_ALARM_MODEL, mPresenter.getCurrentAlarmModel());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -167,8 +178,10 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
         renderRingtoneButton(alarmModel.getRingtone());
 
         mSwVibrate.setChecked(alarmModel.isVibrateEnabled());
-        mSbShakePower.setProgress(alarmModel.getShakePower());
         mEditLabel.setText(alarmModel.getAlarmLabel());
+        mEditLabel.clearFocus();
+        mSbShakePower.setProgress(alarmModel.getShakePower());
+
     }
 
     @Override
@@ -349,7 +362,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     private String getRingtoneNameFromUri(Uri uri) {
         Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
         String title = ringtone.getTitle(this);
-        Log.v(LOG_TAG, "getRingtoneNameFromUri(): uri = " + uri + ", title = " + title);
+        // Log.v(LOG_TAG, "getRingtoneNameFromUri(): uri = " + uri + ", title = " + title);
         String[] tokens = title.split("\\.(?=[^\\.]+$)");
         return tokens[0];
     }

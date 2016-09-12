@@ -45,9 +45,6 @@ public class AlarmModel implements Parcelable {
         mId = -1;
         mIsEnabled = false;
 
-//        Calendar current = Calendar.getInstance();
-//        mStart = current.getTime();
-
         Calendar current = Calendar.getInstance();
         Calendar start = Calendar.getInstance();
         start.setTime(new Date(0));
@@ -61,6 +58,18 @@ public class AlarmModel implements Parcelable {
         mIsVibrateEnabled = false;
         mShakePower = 30;
         mAlarmLabel = "";
+    }
+
+    public AlarmModel(AlarmModel alarmModel) {
+        mId = alarmModel.getId();
+        mIsEnabled = alarmModel.isEnabled();
+        mStart = new Date(alarmModel.getStart().getTime());
+        mIsRepeated = alarmModel.isRepeated();
+        mRepeatDays = new HashSet<>(alarmModel.getRepeatDays());
+        mRingtone = alarmModel.getRingtone();
+        mIsVibrateEnabled = alarmModel.isVibrateEnabled();
+        mShakePower = alarmModel.getShakePower();
+        mAlarmLabel = alarmModel.getAlarmLabel();
     }
 
     public long getId() {

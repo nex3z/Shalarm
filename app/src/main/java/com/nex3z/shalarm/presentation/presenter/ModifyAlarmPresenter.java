@@ -72,19 +72,14 @@ public abstract class ModifyAlarmPresenter implements Presenter {
         mView.renderStartTime(date);
     }
 
+    public AlarmModel getCurrentAlarmModel() {
+        updateCurrentAlarm();
+        return new AlarmModel(mAlarmModel);
+    }
+
     @SuppressWarnings("unchecked")
     public void onSave() {
-        mAlarmModel.setEnabled(true);
-
-        Set<Integer> repeatDays = mView.getRepeatDays();
-        mAlarmModel.setRepeatDays(repeatDays);
-        mAlarmModel.setRepeated(!repeatDays.isEmpty());
-
-        mAlarmModel.setVibrateEnabled(mView.isVibrateEnabled());
-        mAlarmModel.setShakePower(mView.getShakePower());
-        mAlarmModel.setRingtone(mView.getRingtone());
-        mAlarmModel.setAlarmLabel(mView.getLabel());
-        Log.v(LOG_TAG, "onSave(): " + mAlarmModel);
+        updateCurrentAlarm();
 
         AlarmArg arg = new AlarmArg(mMapper.toAlarm(mAlarmModel));
         mModifyAlarm.init(arg).execute(getSubscriber());
@@ -102,6 +97,20 @@ public abstract class ModifyAlarmPresenter implements Presenter {
     }
 
     protected abstract DefaultSubscriber getSubscriber();
+
+    protected void updateCurrentAlarm() {
+        mAlarmModel.setEnabled(true);
+
+        Set<Integer> repeatDays = mView.getRepeatDays();
+        mAlarmModel.setRepeatDays(repeatDays);
+        mAlarmModel.setRepeated(!repeatDays.isEmpty());
+
+        mAlarmModel.setVibrateEnabled(mView.isVibrateEnabled());
+        mAlarmModel.setShakePower(mView.getShakePower());
+        mAlarmModel.setRingtone(mView.getRingtone());
+        mAlarmModel.setAlarmLabel(mView.getLabel());
+        Log.v(LOG_TAG, "updateCurrentAlarm(): " + mAlarmModel);
+    }
 
     private final class DeleteAlarmSubscriber extends DefaultSubscriber<Integer> {
         @Override
