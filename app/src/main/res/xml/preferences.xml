@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/pref_shake_detector_category_title"
-        android:key="pref_key_shake_detector">
-        <Preference android:title="@string/pref_shake_detector_calibrate" >
+        android:title="@string/pref_category_title_shake_detector">
+        <Preference android:title="@string/pref_title_calibrate" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetPackage="com.nex3z.shalarm"
                 android:targetClass="com.nex3z.shalarm.presentation.ui.activity.CalibrateActivity"/>
         </Preference>
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_title_alarm">
+        <ListPreference
+            android:title="@string/pref_title_alert_timeout"
+            android:key="@string/pref_key_alert_timeout"
+            android:entries="@array/pref_alert_timeout_entries"
+            android:entryValues="@array/pref_alert_timeout_entryValues"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:defaultValue="5"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -43,8 +43,11 @@
     <string name="everyday">Everyday</string>
     <string name="workday">Workdays</string>
 
-    <string name="pref_shake_detector_category_title">Shake Detector</string>
-    <string name="pref_shake_detector_calibrate">Calibrate</string>
+    <string name="pref_category_title_shake_detector">Shake Detector</string>
+    <string name="pref_title_calibrate">Calibrate</string>
+    <string name="pref_category_title_alarm">Alarm</string>
+    <string name="pref_title_alert_timeout">Alert timeout</string>
+    <string name="pref_key_alert_timeout">key_alert_timeout</string>
 
     <string name="calibrate_message">Please shake your device repeatedly as hard as you can until the number below stops increasing, then press the Calibrate button below. Be careful.</string>
     <string name="invalid_calibrate_message">Please shake your device harder to get a bigger Maximum Force first.</string>

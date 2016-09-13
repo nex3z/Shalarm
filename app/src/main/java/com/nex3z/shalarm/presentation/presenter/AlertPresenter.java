@@ -19,7 +19,6 @@ public class AlertPresenter implements Presenter {
     private static final String LOG_TAG = AlertPresenter.class.getSimpleName();
 
     private static final int ALERT_TIMEOUT_EVENT = 1;
-    private static final long ALERT_TIMEOUT = 5 * 60 * 1000;
 
     private AlarmModel mAlarmModel;
     private UseCase mUpdateAlarm;
@@ -59,7 +58,7 @@ public class AlertPresenter implements Presenter {
         }
 
         Message msg = mHandler.obtainMessage(ALERT_TIMEOUT_EVENT);
-        mHandler.sendMessageDelayed(msg, ALERT_TIMEOUT);
+        mHandler.sendMessageDelayed(msg, AlarmUtility.getPrefAlertTimeout());
     }
 
     public void onAlertCanceled() {
@@ -88,7 +87,7 @@ public class AlertPresenter implements Presenter {
         try {
             mView.pauseRingtone();
         } catch (IllegalStateException e) {
-            Log.e(LOG_TAG, "onCallStateRinging(): e = " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -97,7 +96,7 @@ public class AlertPresenter implements Presenter {
         try {
             mView.startRingtone();
         } catch (IllegalStateException e) {
-            Log.e(LOG_TAG, "onCallStateIdle(): e = " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

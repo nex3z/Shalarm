@@ -19,4 +19,19 @@
         <item>Fri</item>
         <item>Sat</item>
     </string-array>
+
+    <string-array name="pref_alert_timeout_entries">
+        <item>1 minute</item>
+        <item>2 minutes</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+    </string-array>
+
+    <string-array name="pref_alert_timeout_entryValues">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+    </string-array>
+
 </resources>
