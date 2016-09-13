@@ -32,6 +32,7 @@
             android:id="@+id/toggle_weekdays"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:textSize="18sp"
             app:buttonWidth="42dp"
             app:buttonHeight="42dp"
@@ -39,7 +40,6 @@
             app:uncheckedTextColor="@android:color/black"
             app:checkedTextColor="@android:color/white"
             app:checkedBackground="@drawable/ic_circle_48dp"
-            app:spacing="0dp"
             app:animationEnabled="true"/>
 
     </TableRow>
