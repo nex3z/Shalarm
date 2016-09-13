@@ -27,6 +27,7 @@
     <string name="alarm_detail_repeat">Repeat</string>
     <string name="alarm_detail_vibrate">Vibrate</string>
     <string name="alarm_detail_ringtone">Ringtone</string>
+    <string name="alarm_detail_ringtone_none">None</string>
     <string name="alarm_detail_shake_power">Shake Power:\u0020</string>
     <string name="alarm_detail_shake_power_light">Shake me softly</string>
     <string name="alarm_detail_shake_power_medium">Fully awake</string>

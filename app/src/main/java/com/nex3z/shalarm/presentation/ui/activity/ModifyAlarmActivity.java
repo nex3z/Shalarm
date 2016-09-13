@@ -26,7 +26,6 @@ import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.ModifyAlarmPresenter;
 import com.nex3z.shalarm.presentation.ui.AddAlarmView;
 import com.nex3z.shalarm.presentation.ui.misc.MultiSelectToggleGroup;
-import com.nex3z.shalarm.presentation.ui.misc.ToggleButtonGroup;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -150,14 +149,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
 
     @Override
     public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute, int second) {
-        Log.v(LOG_TAG, "onTimeSet(): hourOfDay = " + hourOfDay + ", minute = " + minute);
-        Calendar calendar = GregorianCalendar.getInstance();
-
-        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-
-        mPresenter.onStartTimeSet(calendar.getTime());
+        mPresenter.onStartTimeSet(hourOfDay, minute, second);
     }
 
     @Override
@@ -239,9 +231,12 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
                 Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
                 if (uri != null) {
                     mRingtone = uri;
-                    String name = getRingtoneNameFromUri(uri);
-                    mBtnRingtone.setText(name);
+                } else {
+                    mRingtone = Uri.EMPTY;
                 }
+                Log.v(LOG_TAG, "onActivityResult(): mRingtone = " + mRingtone);
+                String name = getRingtoneNameFromUri(mRingtone);
+                mBtnRingtone.setText(name);
             }
         }
     }
@@ -255,9 +250,8 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     public void onRingtoneClicked(View view) {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
-        // intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mRingtone);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
         startActivityForResult(intent, PICK_RINGTONE_REQUEST);
     }
@@ -293,13 +287,6 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     private void initMultiSwitchToggle() {
         String[] weekdays = getResources().getStringArray(R.array.weekdays);
         ArrayList<String> weekdaysList = new ArrayList<>(Arrays.asList(weekdays));
-        mToggleWeekdays.setOnCheckedStateChangeListener(new ToggleButtonGroup.OnCheckedStateChangeListener() {
-            @Override
-            public void onCheckedStateChange(int position, boolean isChecked) {
-                Set<Integer> positions = mToggleWeekdays.getCheckedPositions();
-                Log.v(LOG_TAG, "onToggleButtonStateChanged(): positions = " + positions);
-            }
-        });
     }
 
     private void initProgressBar() {
@@ -327,13 +314,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     }
 
     private void renderRingtoneButton(Uri uri) {
-        Log.v(LOG_TAG, "renderRingtoneButton(): uri = " + uri);
-        if (uri == null) {
-            mRingtone = RingtoneManager.getActualDefaultRingtoneUri(this,
-                    RingtoneManager.TYPE_ALARM);
-        } else {
-            mRingtone = uri;
-        }
+        mRingtone = uri;
         mBtnRingtone.setText(getRingtoneNameFromUri(mRingtone));
     }
 
@@ -357,11 +338,14 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
     }
 
     private String getRingtoneNameFromUri(Uri uri) {
-        Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
-        String title = ringtone.getTitle(this);
-        // Log.v(LOG_TAG, "getRingtoneNameFromUri(): uri = " + uri + ", title = " + title);
-        String[] tokens = title.split("\\.(?=[^\\.]+$)");
-        return tokens[0];
+        if (uri != null && !uri.equals(Uri.EMPTY)) {
+            Ringtone ringtone = RingtoneManager.getRingtone(this, uri);
+            String title = ringtone.getTitle(this);
+            String[] tokens = title.split("\\.(?=[^\\.]+$)");
+            return tokens[0];
+        } else {
+            return getString(R.string.alarm_detail_ringtone_none);
+        }
     }
 
 }

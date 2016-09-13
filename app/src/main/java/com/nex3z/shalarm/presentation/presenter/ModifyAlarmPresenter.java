@@ -1,5 +1,7 @@
 package com.nex3z.shalarm.presentation.presenter;
 
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.util.Log;
 
 import com.nex3z.shalarm.domain.interactor.DefaultSubscriber;
@@ -11,7 +13,9 @@ import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.ui.AddAlarmView;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Set;
 
 public abstract class ModifyAlarmPresenter implements Presenter {
@@ -58,6 +62,9 @@ public abstract class ModifyAlarmPresenter implements Presenter {
     public void initialize() {
         if (mAlarmModel == null) {
             mAlarmModel = new AlarmModel();
+            Uri ringtone = RingtoneManager.getActualDefaultRingtoneUri(mView.getContext(),
+                    RingtoneManager.TYPE_ALARM);
+            mAlarmModel.setRingtone(ringtone);
         }
         mView.renderAlarm(mAlarmModel);
     }
@@ -66,10 +73,17 @@ public abstract class ModifyAlarmPresenter implements Presenter {
         mView.showTimePicker(mAlarmModel.getStart());
     }
 
-    public void onStartTimeSet(Date date) {
-        Log.v(LOG_TAG, "onStartTimeSet(): date = " + date);
-        mAlarmModel.setStart(date);
-        mView.renderStartTime(date);
+    public void onStartTimeSet(int hourOfDay, int minute, int second) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(mAlarmModel.getStart());
+
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+
+        Date start = calendar.getTime();
+        mAlarmModel.setStart(start);
+        mView.renderStartTime(start);
     }
 
     public AlarmModel getCurrentAlarmModel() {
@@ -80,7 +94,6 @@ public abstract class ModifyAlarmPresenter implements Presenter {
     @SuppressWarnings("unchecked")
     public void onSave() {
         updateCurrentAlarm();
-
         AlarmArg arg = new AlarmArg(mMapper.toAlarm(mAlarmModel));
         mModifyAlarm.init(arg).execute(getSubscriber());
 
