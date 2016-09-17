@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -79,7 +80,9 @@ public class AlarmService extends Service {
 
         if (nextAlarm != null) {
             Intent intent = new Intent(context, AlertBroadcastReceiver.class);
-            intent.putExtra(AlertBroadcastReceiver.ALARM, nextAlarm);
+            Bundle alarmBundle = new Bundle();
+            alarmBundle.putParcelable(AlertBroadcastReceiver.ALARM, nextAlarm);
+            intent.putExtra(AlertBroadcastReceiver.ALARM_BUNDLE, alarmBundle);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
