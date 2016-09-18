@@ -18,7 +18,7 @@
         <activity
             android:name=".presentation.ui.activity.AlarmListActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -29,7 +29,7 @@
             android:name=".presentation.ui.activity.AddAlarmActivity"
             android:label="@string/title_activity_add_alarm"
             android:parentActivityName=".presentation.ui.activity.AlarmListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Detail">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>
@@ -38,7 +38,7 @@
             android:name=".presentation.ui.activity.EditAlarmActivity"
             android:label="@string/title_activity_edit_alarm"
             android:parentActivityName=".presentation.ui.activity.AlarmListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Detail">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>

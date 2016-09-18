@@ -11,4 +11,14 @@
         <item name="android:statusBarColor">@android:color/darker_gray</item>
     </style>
 
+    <style name="AppTheme.Main" parent="@style/AppTheme.NoActionBar">
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+
+    <style name="AppTheme.Detail" parent="@style/AppTheme.NoActionBar">
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowEnterTransition">@transition/alarm_detail_enter_transition</item>
+        <item name="android:windowReturnTransition">@transition/alarm_detail_return_transition</item>
+    </style>
+
 </resources>

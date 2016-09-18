@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -126,7 +128,9 @@ public class AlarmListActivity extends AppCompatActivity
         Log.v(LOG_TAG, "onItemSelected(): alarmModel = " + alarmModel);
         Intent intent = new Intent(this, EditAlarmActivity.class)
                 .putExtra(EditAlarmActivity.ALARM_INFO, alarmModel);
-        startActivity(intent);
+        ActivityOptionsCompat activityOptions =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+        ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
     }
 
     private void initialize() {
@@ -150,7 +154,9 @@ public class AlarmListActivity extends AppCompatActivity
     private void setupFloatingActionButton() {
         mFab.setOnClickListener(view -> {
             Intent intent = new Intent(AlarmListActivity.this, AddAlarmActivity.class);
-            startActivity(intent);
+            ActivityOptionsCompat activityOptions =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(this);
+            ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         });
     }
 
