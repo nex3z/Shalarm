@@ -25,7 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:paddingBottom="8dp"
-            android:textSize="56sp"
+            android:textSize="@dimen/alarm_detail_alert_time_text_size"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             tools:text="12:30"/>
 
     </android.support.design.widget.AppBarLayout>

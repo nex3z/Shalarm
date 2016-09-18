@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="layout" name="content_modify_alarm">@layout/content_modify_alarm_card</item>
+</resources>

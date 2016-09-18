@@ -7,6 +7,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <dimen name="alarm_detail_alert_time_text_size">56sp</dimen>
     <dimen name="alarm_detail_row_margin_right">8dp</dimen>
     <dimen name="alarm_detail_row_margin_left">8dp</dimen>
     <dimen name="alarm_detail_row_height">56dp</dimen>
@@ -14,6 +15,7 @@
     <dimen name="alarm_detail_icon_margin_left">8dp</dimen>
     <dimen name="alarm_detail_icon_margin_right">16dp</dimen>
     <dimen name="alarm_detail_item_text_size">16sp</dimen>
+    <dimen name="alarm_detail_card_margin_left_right">96dp</dimen>
 
     <dimen name="alarm_item_padding_left">16sp</dimen>
     <dimen name="alarm_item_padding_right">16sp</dimen>
