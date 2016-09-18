@@ -12,7 +12,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.nex3z.shalarm.R;
-import com.nex3z.shalarm.app.App;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
@@ -21,7 +20,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -54,7 +52,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         String startTime = TIME_FORMAT.format(alarm.getStart());
         holder.mTvAlarmTime.setText(startTime);
         holder.mTvAlarmLabel.setText(alarm.getAlarmLabel());
-        holder.mTvRepeatDays.setText(getDaysDescription(alarm.getRepeatDays()));
+        holder.mTvRepeatDays.setText(AlarmUtility.getDaysDescription(alarm.getRepeatDays()));
         holder.mSwEnable.setChecked(alarm.isEnabled());
         holder.mCardView.setCardBackgroundColor(AlarmUtility.getBackgroundColor(
                 alarm.getShakePower()));
@@ -83,27 +81,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         if (alarmCollection == null) {
             throw new IllegalArgumentException("The list cannot be null");
         }
-    }
-
-    private String getDaysDescription(Set<Integer> days) {
-        Context context = App.getAppContext();
-        TreeSet<Integer> sortedDays = new TreeSet<>(days);
-
-        StringBuilder sb = new StringBuilder();
-
-        if (sortedDays.size() == 0) {
-            sb.append(context.getString(R.string.once));
-        } else if (sortedDays.size() == 7) {
-            sb.append(context.getString(R.string.everyday));
-        } else {
-            String[] weekdays = context.getResources().getStringArray(R.array.short_weekdays);
-            for(int day : sortedDays) {
-                sb.append(weekdays[day]);
-                sb.append(" ");
-            }
-        }
-
-        return sb.toString();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
