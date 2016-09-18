@@ -16,5 +16,9 @@
 text
 
 <p align="center">
-<img src="images/drawer.png" width="280"/> <img src="images/edit_alarm.png" width="280"/> <img src="images/alert.png" width="280"/>
+<img src="images/alarm_list.png" width="420"/> <img src="images/edit_alarm.png" width="420"/>
+</p>
+
+<p align="center">
+<img src="images/edit_alarm.png" width="420"/> <img src="images/alert.png" width="420"/>
 </p>
