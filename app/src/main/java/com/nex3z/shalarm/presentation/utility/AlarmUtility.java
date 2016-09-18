@@ -39,6 +39,17 @@ public class AlarmUtility {
         }
     }
 
+    public static String getShakeDescription(int shakePower) {
+        Context context = App.getAppContext();
+        if (shakePower < 33) {
+            return context.getString(R.string.alarm_detail_shake_power_light);
+        } else if (shakePower < 66) {
+            return context.getString(R.string.alarm_detail_shake_power_medium);
+        } else {
+            return context.getString(R.string.alarm_detail_shake_power_hard);
+        }
+    }
+
     public static long getPrefAlertTimeout() {
         Context context = App.getAppContext();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

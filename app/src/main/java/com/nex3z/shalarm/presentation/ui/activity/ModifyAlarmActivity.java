@@ -26,6 +26,7 @@ import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.ModifyAlarmPresenter;
 import com.nex3z.shalarm.presentation.ui.AddAlarmView;
 import com.nex3z.shalarm.presentation.ui.misc.MultiSelectToggleGroup;
+import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -293,16 +294,8 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
         mSbShakePower.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (i < 33) {
-                    mTvShakePowerDescription.setText(getString
-                            (R.string.alarm_detail_shake_power_light));
-                } else if (i < 66) {
-                    mTvShakePowerDescription.setText(getString(
-                            R.string.alarm_detail_shake_power_medium));
-                } else {
-                    mTvShakePowerDescription.setText(getString(
-                            R.string.alarm_detail_shake_power_hard));
-                }
+                mTvShakePowerDescription.setText(AlarmUtility.getShakeDescription(i));
+                mTvShakePowerDescription.setTextColor(AlarmUtility.getBackgroundColor(i));
             }
 
             @Override
