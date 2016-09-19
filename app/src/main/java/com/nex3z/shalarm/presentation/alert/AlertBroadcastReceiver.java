@@ -29,7 +29,7 @@ public class AlertBroadcastReceiver extends BroadcastReceiver {
         if (alarmModel != null) {
             Intent alertIntent = new Intent(context, AlertActivity.class);
             alertIntent.putExtra(AlertActivity.ALARM, alarmModel);
-            alertIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            alertIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             context.startActivity(alertIntent);
         }
     }
