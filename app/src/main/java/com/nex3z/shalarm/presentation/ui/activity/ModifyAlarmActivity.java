@@ -143,9 +143,19 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
             return true;
         } else if (id == R.id.action_delete) {
             requestConfirmDelete();
+        } else if (id == android.R.id.home) {
+            finishView();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.v(LOG_TAG, "onBackPressed()");
+        overridePendingTransition(R.transition.alarm_detail_enter_transition, R.transition.alarm_detail_enter_transition);
     }
 
     @Override
@@ -222,7 +232,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
 
     @Override
     public void finishView() {
-        finish();
+        supportFinishAfterTransition();
     }
 
     @Override
