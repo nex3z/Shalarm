@@ -3,7 +3,7 @@
 一个闹钟应用，闹铃响时，需要用力摇晃手机达到指定力度，才能停止闹铃，杜绝回笼觉。使用前请先在应用的设置中对摇晃力度进行校准。
 
 <p align="center">
-<img src="images/add_alarm_demo.gif" width="420"/> 
+<img src="images/add_alarm_demo.gif" width="360"/> 
 </p>
 
 <p align="center">
