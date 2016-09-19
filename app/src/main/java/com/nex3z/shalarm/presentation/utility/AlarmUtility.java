@@ -11,6 +11,7 @@ import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.app.App;
 import com.nex3z.shalarm.presentation.alert.AlarmServiceBroadcastReceiver;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,6 +22,8 @@ public class AlarmUtility {
 
     private static final String INITIAL_ALERT_TIMEOUT = "5";
     private static final Set<Integer> WORK_DAYS = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
+
+    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
 
     public static void triggerAlarmService(Context context) {
         Log.v(LOG_TAG, "triggerAlarmService()");

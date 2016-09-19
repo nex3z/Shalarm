@@ -70,6 +70,11 @@ public class AlertPresenter implements Presenter {
         mView.finishView();
     }
 
+    public void onAlertMissed() {
+        mView.showMissedAlarmNotification(mAlarmModel);
+        onAlertCanceled();
+    }
+
     public void onShakeForceChanged(float force) {
         if (force > mCurrentForce) {
             mCurrentForce = force;
@@ -146,7 +151,7 @@ public class AlertPresenter implements Presenter {
                 case ALERT_TIMEOUT_EVENT:
                     AlertPresenter presenter = mPresenter.get();
                     if (presenter != null) {
-                        presenter.onAlertCanceled();
+                        presenter.onAlertMissed();
                         Log.v(LOG_TAG, "handleMessage(): cancel alarm");
                     }
                     break;

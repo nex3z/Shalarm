@@ -1,6 +1,9 @@
 package com.nex3z.shalarm.presentation.alert.ui;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,6 +13,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -33,6 +37,7 @@ import com.nex3z.shalarm.presentation.alert.AlertWakeLock;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.AlertPresenter;
+import com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
@@ -43,6 +48,7 @@ import butterknife.OnClick;
 public class AlertActivity extends AppCompatActivity implements AlertView, SensorEventListener {
     private static final String LOG_TAG = AlertActivity.class.getSimpleName();
 
+    private static final int MISSED_ALARM_NOTIFICATION_ID = 1;
     private static final long[] VIBRATE_PATTERN = { 0, 1000, 1000 };
     private static final float MAX_FORCE = 2.0f;
     private static final float ONE_G = 1.0f;
@@ -205,6 +211,30 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {}
+
+    @Override
+    public void showMissedAlarmNotification(AlarmModel alarmModel) {
+        String content = AlarmUtility.TIME_FORMAT.format(alarmModel.getStart());
+        if (alarmModel.getAlarmLabel() != null && !alarmModel.getAlarmLabel().isEmpty()) {
+            content += " " + alarmModel.getAlarmLabel();
+        }
+
+        Intent intent = new Intent(this, AlarmListActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_alarm_white_16)
+                .setContentTitle(getString(R.string.alert_missed_notification_title))
+                .setContentText(content)
+                .setContentIntent(contentIntent)
+                .setAutoCancel(true);
+
+        NotificationManager NotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager.notify(MISSED_ALARM_NOTIFICATION_ID, mBuilder.build());
+    }
 
     private void init(AlarmModel alarmModel) {
         initAlert();

@@ -25,6 +25,8 @@ public interface AlertView {
 
     void showResult(long time);
 
+    void showMissedAlarmNotification(AlarmModel alarmModel);
+
     void showMessage(String message);
 
     Context getContext();
