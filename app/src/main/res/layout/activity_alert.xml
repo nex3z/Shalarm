@@ -13,14 +13,22 @@
     tools:context="com.nex3z.shalarm.presentation.alert.ui.AlertActivity">
 
     <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        android:textSize="48sp"
+        android:textColor="@android:color/black"
+        tools:text="12:30"/>
+
+    <TextView
         android:id="@+id/tv_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="16dp"
         android:layout_gravity="center"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:maxLines="2"
         android:minLines="1"
         android:ellipsize="end"
@@ -36,7 +44,6 @@
         app:showProgressText="true"
         app:progressTextSize="32sp"
         app:progressTextSuffix="%">
-
     </com.nex3z.shalarm.presentation.alert.ui.ExpandableCircleView>
 
     <Button
@@ -44,7 +51,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/cancel_alert"
-        android:background="?android:attr/selectableItemBackground"
-        android:layout_alignParentBottom="true"/>
+        android:background="?android:attr/selectableItemBackground"/>
 
 </LinearLayout>

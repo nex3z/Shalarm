@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,8 @@ import com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -58,10 +61,20 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     private Vibrator mVibrator;
     private MediaPlayer mMediaPlayer;
     private AlertPresenter mPresenter;
+    private Handler mClockUpdateHandler = new Handler();
+    private Runnable mClockUpdateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mTvTime.setText(AlarmUtility.TIME_FORMAT.format(new Date()));
+            mClockUpdateHandler.postDelayed(this, 1000);
+            Log.v(LOG_TAG, "run() ");
+        }
+    };
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
+    @BindView(R.id.tv_time) TextView mTvTime;
     @BindView(R.id.tv_label) TextView mTvLabel;
     @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
 
@@ -91,6 +104,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         super.onResume();
         mPresenter.resume();
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mClockUpdateHandler.post(mClockUpdateRunnable);
     }
 
     @Override
@@ -98,6 +112,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         super.onPause();
         mPresenter.pause();
         mSensorManager.unregisterListener(this);
+        mClockUpdateHandler.removeCallbacks(mClockUpdateRunnable);
 
         AlertWakeLock.unlock(this);
     }
@@ -238,12 +253,12 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     private void init(AlarmModel alarmModel) {
         initAlert();
-        initShakeDetector(alarmModel);
+        initShakeDetector();
         initPresenter(alarmModel);
         initPhoneStateListener();
     }
 
-    private void initShakeDetector(AlarmModel alarmModel) {
+    private void initShakeDetector() {
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }

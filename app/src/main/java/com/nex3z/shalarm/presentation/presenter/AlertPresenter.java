@@ -150,7 +150,7 @@ public class AlertPresenter implements Presenter {
             switch (msg.what) {
                 case ALERT_TIMEOUT_EVENT:
                     AlertPresenter presenter = mPresenter.get();
-                    if (presenter != null) {
+                    if (presenter != null && presenter.mView != null) {
                         presenter.onAlertMissed();
                         Log.v(LOG_TAG, "handleMessage(): cancel alarm");
                     }
