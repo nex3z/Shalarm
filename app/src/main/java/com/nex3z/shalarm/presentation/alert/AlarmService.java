@@ -43,7 +43,7 @@ public class AlarmService extends Service {
 
     private AlarmModelDataMapper mMapper = new AlarmModelDataMapper();
     private UseCase mGetAlarmList;
-    private AlarmModel mNext;
+    private AlarmModel mNextAlarm;
 
     public static void startActionScheduleNextAlarm(Context context) {
         Intent intent = new Intent(context, AlarmService.class);
@@ -89,8 +89,8 @@ public class AlarmService extends Service {
     }
 
     private void handleActionRetrieveNextAlarm() {
-        Log.v(LOG_TAG, "handleActionRetrieveNextAlarm(): mNext = " + mNext);
-        notifyNextAlarm(mNext);
+        Log.v(LOG_TAG, "handleActionRetrieveNextAlarm(): mNextAlarm = " + mNextAlarm);
+        notifyNextAlarm(mNextAlarm);
     }
 
     @Override
@@ -100,27 +100,26 @@ public class AlarmService extends Service {
     }
 
     private void scheduleNextAlarm(List<AlarmModel> alarms) {
-        AlarmModel nextAlarm = getNextAlarm(alarms);
-        Log.v(LOG_TAG, "scheduleNextAlarm(): nextAlarm = " + nextAlarm);
+        mNextAlarm = getNextAlarm(alarms);
+        Log.v(LOG_TAG, "scheduleNextAlarm(): nextAlarm = " + mNextAlarm);
 
         Context context = getApplicationContext();
+        if (mNextAlarm != null) {
 
-        if (nextAlarm != null) {
-            mNext = nextAlarm;
             Intent intent = new Intent(ACTION_SET_ALARM);
             Bundle alarmBundle = new Bundle();
-            alarmBundle.putParcelable(EXTRA_NEXT_ALARM, nextAlarm);
+            alarmBundle.putParcelable(EXTRA_NEXT_ALARM, mNextAlarm);
             intent.putExtra(EXTRA_NEXT_ALARM_BUNDLE, alarmBundle);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
 
             AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-            manager.set(AlarmManager.RTC_WAKEUP, nextAlarm.getNextAlertTime().getTime(),
+            manager.set(AlarmManager.RTC_WAKEUP, mNextAlarm.getNextAlertTime().getTime(),
                     pendingIntent);
 
             Log.v(LOG_TAG, "scheduleNextAlarm(): set next alarm at "
-                    + nextAlarm.getNextAlertTime());
+                    + mNextAlarm.getNextAlertTime());
         } else {
             Intent intent = new Intent(ACTION_SET_ALARM);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0,
@@ -130,7 +129,7 @@ public class AlarmService extends Service {
             alarmManager.cancel(pendingIntent);
         }
 
-        notifyNextAlarm(nextAlarm);
+        notifyNextAlarm(mNextAlarm);
     }
 
     private void notifyNextAlarm(AlarmModel alarmModel) {
