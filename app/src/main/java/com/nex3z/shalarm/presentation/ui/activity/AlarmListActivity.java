@@ -48,6 +48,7 @@ public class AlarmListActivity extends AppCompatActivity
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.fab) FloatingActionButton mFab;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
+    @BindView(R.id.nav_view) NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,10 +140,10 @@ public class AlarmListActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
-        navigationView.getMenu().getItem(0).setChecked(true);
+        mNavigationView.getMenu().getItem(0).setChecked(true);
     }
 
     private void setupFloatingActionButton() {
@@ -164,10 +165,11 @@ public class AlarmListActivity extends AppCompatActivity
     }
 
     private void renderNextAlarmTime(AlarmModel alarmModel) {
-        TextView nextAlarm = (TextView) findViewById(R.id.tv_next_alarm_time);
-        LinearLayout container = (LinearLayout) findViewById(R.id.linear_nav_header);
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.pb_loading_next_alarm);
+        View header =  mNavigationView.getHeaderView(0);
 
+        TextView nextAlarm = (TextView) header.findViewById(R.id.tv_next_alarm_time);
+        LinearLayout container = (LinearLayout) header.findViewById(R.id.linear_nav_header);
+        ProgressBar progressBar = (ProgressBar) header.findViewById(R.id.pb_loading_next_alarm);
         progressBar.setVisibility(View.GONE);
         nextAlarm.setVisibility(View.VISIBLE);
 
