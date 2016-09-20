@@ -43,7 +43,7 @@ public class AlarmListActivity extends AppCompatActivity
 
     private String mFilter = AlarmListFragment.FILTER_ALL_ALARMS;
 
-    private BroadcastReceiver mReceiver;
+    private BroadcastReceiver mReceiver = new NextAlarmBroadcastReceiver();
 
     @BindView(R.id.toolbar) Toolbar mToolbar;
     @BindView(R.id.fab) FloatingActionButton mFab;
@@ -73,14 +73,7 @@ public class AlarmListActivity extends AppCompatActivity
         super.onResume();
         mFab.show();
         IntentFilter intentFilter = new IntentFilter(AlarmService.NEXT_ALARM_UPDATE);
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                AlarmModel alarmModel = intent.getParcelableExtra(AlarmService.NEXT_ALARM);
-                Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
-                renderNextAlarmTime(alarmModel);
-            }
-        };
+        AlarmUtility.triggerAlarmService(this);
         registerReceiver(mReceiver, intentFilter);
     }
 
@@ -186,6 +179,14 @@ public class AlarmListActivity extends AppCompatActivity
             container.setBackgroundColor(
                     ContextCompat.getColor(this, R.color.color_nav_header_alarm_disabled));
         }
+    }
 
+    private class NextAlarmBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            AlarmModel alarmModel = intent.getParcelableExtra(AlarmService.NEXT_ALARM);
+            Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
+            renderNextAlarmTime(alarmModel);
+        }
     }
 }

@@ -36,12 +36,8 @@ public class AlarmService extends Service {
     public static final String NEXT_ALARM_UPDATE = "com.nex3z.shalarm.presentation.alert.NEXT_ALARM_UPDATE";
     public static final String NEXT_ALARM = "next_alarm";
 
-    private AlarmModelDataMapper mMapper;
+    private AlarmModelDataMapper mMapper = new AlarmModelDataMapper();
     private UseCase mGetAlarmList;
-
-    public AlarmService() {
-        mMapper = new AlarmModelDataMapper();
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
