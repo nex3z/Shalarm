@@ -47,7 +47,7 @@
     <string name="pref_category_title_shake_detector">Shake Detector</string>
     <string name="pref_title_calibrate">Calibrate</string>
     <string name="pref_category_title_alarm">Alarm</string>
-    <string name="pref_title_alert_timeout">Alert timeout</string>
+    <string name="pref_title_alert_timeout">Silence after</string>
     <string name="pref_key_alert_timeout" translatable="false">key_alert_timeout</string>
 
     <string name="calibrate_message">Please shake your device repeatedly as hard as you can until the number below stops increasing, then press the Calibrate button below. Be careful.</string>

@@ -10,7 +10,7 @@
     <string name="nav_settings">设置</string>
 
     <string name="nav_header_next_alarm_at">下一个闹钟：</string>
-    <string name="nav_header_no_enabled_alarm">禁用</string>
+    <string name="nav_header_no_enabled_alarm">无</string>
 
     <string name="action_settings">设置</string>
     <string name="action_save">保存</string>
@@ -38,7 +38,7 @@
     <string name="pref_category_title_shake_detector">摇晃检测</string>
     <string name="pref_title_calibrate">校准</string>
     <string name="pref_category_title_alarm">闹钟</string>
-    <string name="pref_title_alert_timeout">响铃超时</string>
+    <string name="pref_title_alert_timeout">响铃时长</string>
 
     <string name="calibrate_message">请反复用力摇晃设备，直到下方的数字不在增加，然后按下屏幕底部的校准按钮。请握紧您的设备。</string>
     <string name="invalid_calibrate_message">力度过小，请更加用力地摇晃设备。</string>
