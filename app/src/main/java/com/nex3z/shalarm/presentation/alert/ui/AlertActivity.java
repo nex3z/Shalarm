@@ -51,7 +51,11 @@ import butterknife.OnClick;
 public class AlertActivity extends AppCompatActivity implements AlertView, SensorEventListener {
     private static final String LOG_TAG = AlertActivity.class.getSimpleName();
 
-    private static final int MISSED_ALARM_NOTIFICATION_ID = 1;
+    private static final int NOTIFICATION_ID_MISSED_ALARM = 1;
+    private static final int NOTIFICATION_ID_ALERTING = 2;
+    private static final String ACTION_ALERTING_NOTIFICATION_DISMISSED = "com.nex3z.shalarm.presentation.alert.ui.action.ALERTING_NOTIFICATION_DISMISSED";
+    private static final String ACTION_RELAUNCH = "com.nex3z.shalarm.presentation.alert.ui.action.ACTION_RELAUNCH";
+
     private static final long[] VIBRATE_PATTERN = { 0, 1000, 1000 };
     private static final float MAX_FORCE = 2.0f;
     private static final float ONE_G = 1.0f;
@@ -67,7 +71,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         public void run() {
             mTvTime.setText(AlarmUtility.TIME_FORMAT.format(new Date()));
             mClockUpdateHandler.postDelayed(this, 1000);
-            Log.v(LOG_TAG, "run() ");
         }
     };
 
@@ -100,6 +103,16 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        final String action = intent.getAction();
+        if (action.equals(ACTION_ALERTING_NOTIFICATION_DISMISSED)) {
+            mPresenter.onAlertCanceled();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         mPresenter.resume();
@@ -125,9 +138,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     @OnClick(R.id.btn_cancel_alert)
     public void onClick(View view) {
-        Log.v(LOG_TAG, "OnClick");
         mPresenter.onAlertCanceled();
-        finish();
     }
 
     @Override
@@ -138,6 +149,8 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         if (label != null && !label.isEmpty()) {
             mTvLabel.setText(label);
         }
+
+        showAlertingNotification(alarmModel);
     }
 
     @Override
@@ -160,7 +173,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         try {
             mMediaPlayer.start();
         } catch (IllegalStateException e) {
-            Log.e(LOG_TAG, "startRingtone(): e = " + e.getMessage());
+            Log.e(LOG_TAG, "startRingtone(): IllegalStateException " + e.getMessage());
         }
     }
 
@@ -169,7 +182,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         try {
             mMediaPlayer.pause();
         } catch (IllegalStateException e) {
-            Log.e(LOG_TAG, "pauseRingtone(): e = " + e.getMessage());
+            Log.e(LOG_TAG, "pauseRingtone(): IllegalStateException " + e.getMessage());
         }
     }
 
@@ -210,6 +223,9 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     @Override
     public void finishView() {
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(NOTIFICATION_ID_ALERTING);
         finish();
     }
 
@@ -235,7 +251,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         }
 
         Intent intent = new Intent(this, AlarmListActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(
                 this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -248,7 +263,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
         NotificationManager NotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationManager.notify(MISSED_ALARM_NOTIFICATION_ID, mBuilder.build());
+        NotificationManager.notify(NOTIFICATION_ID_MISSED_ALARM, mBuilder.build());
     }
 
     private void init(AlarmModel alarmModel) {
@@ -310,6 +325,36 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         };
 
         telephonyManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
+    }
+
+    private void showAlertingNotification(AlarmModel alarmModel) {
+        String title = alarmModel.getAlarmLabel();
+        if (title == null || title.isEmpty()) {
+            title = getString(R.string.alerting_notification_title);
+        }
+
+        String content = AlarmUtility.TIME_FORMAT.format(alarmModel.getStart());
+
+        Intent clickIntent = new Intent(this, AlertActivity.class);
+        clickIntent.setAction(ACTION_RELAUNCH);
+        PendingIntent contentIntent = PendingIntent.getActivity(
+                this, 0, clickIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        Intent dismissIntent = new Intent(this, AlertActivity.class);
+        dismissIntent.setAction(ACTION_ALERTING_NOTIFICATION_DISMISSED);
+        PendingIntent deleteIntent = PendingIntent.getActivity(
+                this, 0, dismissIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_alarm_white_16)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setContentIntent(contentIntent)
+                .setDeleteIntent(deleteIntent);
+
+        NotificationManager NotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager.notify(NOTIFICATION_ID_ALERTING, mBuilder.build());
     }
 
 }

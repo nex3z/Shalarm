@@ -37,6 +37,7 @@
 
     <string name="cancel_alert">Cancel</string>
     <string name="alert_missed_notification_title">Missed alarm</string>
+    <string name="alerting_notification_title">Alarm</string>
 
     <string name="maximum_shake_power">Maximum shake power: </string>
 

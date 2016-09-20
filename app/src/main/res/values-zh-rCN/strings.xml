@@ -29,6 +29,8 @@
 
     <string name="cancel_alert">停止闹铃</string>
     <string name="alert_missed_notification_title">错过的闹钟</string>
+    <string name="alerting_notification_title">闹钟</string>
+
     <string name="maximum_shake_power">最大摇晃力度: </string>
 
     <string name="once">一次</string>
