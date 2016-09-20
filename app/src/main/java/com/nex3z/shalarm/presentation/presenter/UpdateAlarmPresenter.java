@@ -31,7 +31,7 @@ public class UpdateAlarmPresenter extends ModifyAlarmPresenter {
         @Override
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): updated = " + integer);
-            AlarmUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.scheduleNextAlarm(mView.getContext());
         }
     }
 }

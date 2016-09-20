@@ -135,7 +135,7 @@ public abstract class ModifyAlarmPresenter implements Presenter {
         @Override
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): deleted = " + integer);
-            AlarmUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.scheduleNextAlarm(mView.getContext());
         }
     }
 

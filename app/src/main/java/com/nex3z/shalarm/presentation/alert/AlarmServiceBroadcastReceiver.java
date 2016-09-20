@@ -12,7 +12,6 @@ public class AlarmServiceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(LOG_TAG, "onReceive()");
-        Intent serviceIntent = new Intent(context, AlarmService.class);
-        context.startService(serviceIntent);
+        AlarmService.startActionScheduleNextAlarm(context);
     }
 }

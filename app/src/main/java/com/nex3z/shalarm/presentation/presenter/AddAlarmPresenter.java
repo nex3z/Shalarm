@@ -31,7 +31,7 @@ public class AddAlarmPresenter extends ModifyAlarmPresenter {
         @Override
         public void onNext(Long aLong) {
             Log.v(LOG_TAG, "onNext(): Alarm saved, id = " + aLong);
-            AlarmUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.scheduleNextAlarm(mView.getContext());
         }
     }
 }

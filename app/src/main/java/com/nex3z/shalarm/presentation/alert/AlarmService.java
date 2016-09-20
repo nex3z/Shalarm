@@ -33,11 +33,29 @@ import rx.android.schedulers.AndroidSchedulers;
 public class AlarmService extends Service {
     private static final String LOG_TAG = AlarmService.class.getSimpleName();
 
-    public static final String NEXT_ALARM_UPDATE = "com.nex3z.shalarm.presentation.alert.NEXT_ALARM_UPDATE";
-    public static final String NEXT_ALARM = "next_alarm";
+    public static final String EXTRA_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.extra.EXTRA_NEXT_ALARM";
+    public static final String EXTRA_NEXT_ALARM_BUNDLE = "com.nex3z.shalarm.presentation.alert.extra.EXTRA_NEXT_ALARM_BUNDLE";
+
+    public static final String ACTION_SCHEDULE_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.action.SCHEDULE_NEXT_ALARM";
+    public static final String ACTION_RETRIEVE_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.action.RETRIEVE_NEXT_ALARM";
+    public static final String ACTION_NEXT_ALARM_UPDATE = "com.nex3z.shalarm.presentation.alert.action.ACTION_NEXT_ALARM_UPDATE";
+    public static final String ACTION_SET_ALARM = "com.nex3z.shalarm.presentation.alert.action.ACTION_SET_ALARM";
 
     private AlarmModelDataMapper mMapper = new AlarmModelDataMapper();
     private UseCase mGetAlarmList;
+    private AlarmModel mNext;
+
+    public static void startActionScheduleNextAlarm(Context context) {
+        Intent intent = new Intent(context, AlarmService.class);
+        intent.setAction(ACTION_SCHEDULE_NEXT_ALARM);
+        context.startService(intent);
+    }
+
+    public static void startActionRetrieveNextAlarm(Context context) {
+        Intent intent = new Intent(context, AlarmService.class);
+        intent.setAction(ACTION_RETRIEVE_NEXT_ALARM);
+        context.startService(intent);
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -46,26 +64,39 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        getAlarms();
+        final String action = intent.getAction();
+        Log.v(LOG_TAG, "onStartCommand(): action = " + action);
+
+        if (action.equals(ACTION_SCHEDULE_NEXT_ALARM)) {
+            handleActionScheduleNextAlarm();
+        } else if (action.equals(ACTION_RETRIEVE_NEXT_ALARM)) {
+            handleActionRetrieveNextAlarm();
+        }
+
         return START_STICKY;
+    }
+
+    private void handleActionScheduleNextAlarm() {
+        AlarmRepository repository = new AlarmDataRepository(
+                new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
+        mGetAlarmList = new GetAlarmList(new GetAlarmListArg(), repository,
+                new JobExecutor(), () -> {
+            Handler handler = new Handler();
+            return AndroidSchedulers.from(handler.getLooper());
+        });
+
+        mGetAlarmList.execute(new GetAlarmListSubscriber());
+    }
+
+    private void handleActionRetrieveNextAlarm() {
+        Log.v(LOG_TAG, "handleActionRetrieveNextAlarm(): mNext = " + mNext);
+        notifyNextAlarm(mNext);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mGetAlarmList.unsubscribe();
-    }
-
-    private void getAlarms() {
-        AlarmRepository repository = new AlarmDataRepository(
-                new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
-        mGetAlarmList = new GetAlarmList(new GetAlarmListArg(), repository,
-                new JobExecutor(), () -> {
-                    Handler handler = new Handler();
-                    return AndroidSchedulers.from(handler.getLooper());
-                });
-
-        mGetAlarmList.execute(new GetAlarmListSubscriber());
     }
 
     private void scheduleNextAlarm(List<AlarmModel> alarms) {
@@ -75,10 +106,11 @@ public class AlarmService extends Service {
         Context context = getApplicationContext();
 
         if (nextAlarm != null) {
-            Intent intent = new Intent(context, AlertBroadcastReceiver.class);
+            mNext = nextAlarm;
+            Intent intent = new Intent(ACTION_SET_ALARM);
             Bundle alarmBundle = new Bundle();
-            alarmBundle.putParcelable(AlertBroadcastReceiver.ALARM, nextAlarm);
-            intent.putExtra(AlertBroadcastReceiver.ALARM_BUNDLE, alarmBundle);
+            alarmBundle.putParcelable(EXTRA_NEXT_ALARM, nextAlarm);
+            intent.putExtra(EXTRA_NEXT_ALARM_BUNDLE, alarmBundle);
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                     PendingIntent.FLAG_CANCEL_CURRENT);
@@ -90,13 +122,11 @@ public class AlarmService extends Service {
             Log.v(LOG_TAG, "scheduleNextAlarm(): set next alarm at "
                     + nextAlarm.getNextAlertTime());
         } else {
-            Intent intent = new Intent(getApplicationContext(), AlertBroadcastReceiver.class);
-
+            Intent intent = new Intent(ACTION_SET_ALARM);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0,
-                    intent,PendingIntent.FLAG_CANCEL_CURRENT);
+                    intent, PendingIntent.FLAG_CANCEL_CURRENT);
             AlarmManager alarmManager = (AlarmManager)getApplicationContext()
                     .getSystemService(Context.ALARM_SERVICE);
-
             alarmManager.cancel(pendingIntent);
         }
 
@@ -105,9 +135,9 @@ public class AlarmService extends Service {
 
     private void notifyNextAlarm(AlarmModel alarmModel) {
         Log.v(LOG_TAG, "notifyNextAlarm(): alarmModel = " + alarmModel);
-        Intent intent = new Intent(NEXT_ALARM_UPDATE);
+        Intent intent = new Intent(ACTION_NEXT_ALARM_UPDATE);
         if (alarmModel != null) {
-            intent.putExtra(NEXT_ALARM, alarmModel);
+            intent.putExtra(EXTRA_NEXT_ALARM, alarmModel);
         }
         sendBroadcast(intent);
     }
@@ -120,8 +150,6 @@ public class AlarmService extends Service {
                 alarmQueue.add(alarmModel);
             }
         }
-
-        Log.v(LOG_TAG, "getNext(): alarmQueue size =  " + alarmQueue.size() + ", items = "+ alarmQueue);
 
         if(alarmQueue.iterator().hasNext()){
             return alarmQueue.iterator().next();

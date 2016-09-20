@@ -49,7 +49,7 @@ public class AlarmListPresenter implements Presenter {
 
     public void initialize() {
         loadAlarmList();
-        AlarmUtility.triggerAlarmService(mView.getContext());
+        AlarmUtility.scheduleNextAlarm(mView.getContext());
     }
 
     @SuppressWarnings("unchecked")
@@ -98,7 +98,7 @@ public class AlarmListPresenter implements Presenter {
         @Override
         public void onNext(Integer integer) {
             Log.v(LOG_TAG, "onNext(): updated = " + integer);
-            AlarmUtility.triggerAlarmService(mView.getContext());
+            AlarmUtility.scheduleNextAlarm(mView.getContext());
         }
     }
 }

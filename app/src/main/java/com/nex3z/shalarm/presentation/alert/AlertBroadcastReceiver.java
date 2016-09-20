@@ -13,24 +13,24 @@ import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 public class AlertBroadcastReceiver extends BroadcastReceiver {
     private static final String LOG_TAG = AlertBroadcastReceiver.class.getSimpleName();
 
-    public static final String ALARM_BUNDLE = "alarm_bundle";
-    public static final String ALARM = "alarm";
-
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(LOG_TAG, "onReceive()");
-        AlarmUtility.triggerAlarmService(context);
+        final String action = intent.getAction();
 
-        AlertWakeLock.lock(context);
+        if (action.equals(AlarmService.ACTION_SET_ALARM)) {
+            AlarmUtility.scheduleNextAlarm(context);
 
-        Bundle alarmBundle = intent.getBundleExtra(ALARM_BUNDLE);
-        AlarmModel alarmModel = alarmBundle.getParcelable(ALARM);
-        Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
-        if (alarmModel != null) {
-            Intent alertIntent = new Intent(context, AlertActivity.class);
-            alertIntent.putExtra(AlertActivity.ALARM, alarmModel);
-            alertIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            context.startActivity(alertIntent);
+            AlertWakeLock.lock(context);
+
+            Bundle alarmBundle = intent.getBundleExtra(AlarmService.EXTRA_NEXT_ALARM_BUNDLE);
+            AlarmModel alarmModel = alarmBundle.getParcelable(AlarmService.EXTRA_NEXT_ALARM);
+            Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
+            if (alarmModel != null) {
+                Intent alertIntent = new Intent(context, AlertActivity.class);
+                alertIntent.putExtra(AlertActivity.ALARM, alarmModel);
+                alertIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(alertIntent);
+            }
         }
     }
 }

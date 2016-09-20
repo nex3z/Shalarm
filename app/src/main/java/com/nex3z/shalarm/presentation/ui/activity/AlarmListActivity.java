@@ -72,9 +72,10 @@ public class AlarmListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mFab.show();
-        IntentFilter intentFilter = new IntentFilter(AlarmService.NEXT_ALARM_UPDATE);
-        AlarmUtility.triggerAlarmService(this);
+        IntentFilter intentFilter = new IntentFilter(AlarmService.ACTION_NEXT_ALARM_UPDATE);
         registerReceiver(mReceiver, intentFilter);
+
+        AlarmService.startActionRetrieveNextAlarm(this);
     }
 
     @Override
@@ -184,9 +185,12 @@ public class AlarmListActivity extends AppCompatActivity
     private class NextAlarmBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            AlarmModel alarmModel = intent.getParcelableExtra(AlarmService.NEXT_ALARM);
-            Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
-            renderNextAlarmTime(alarmModel);
+            final String action = intent.getAction();
+            if (action.equals(AlarmService.ACTION_NEXT_ALARM_UPDATE)) {
+                AlarmModel alarmModel = intent.getParcelableExtra(AlarmService.EXTRA_NEXT_ALARM);
+                Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
+                renderNextAlarmTime(alarmModel);
+            }
         }
     }
 }
