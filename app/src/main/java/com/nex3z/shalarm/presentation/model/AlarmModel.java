@@ -54,7 +54,7 @@ public class AlarmModel implements Parcelable {
 
         mIsRepeated = false;
         mRepeatDays = new HashSet<>();
-        mRingtone = null;
+        mRingtone = Uri.EMPTY;
         mIsVibrateEnabled = false;
         mShakePower = 30;
         mAlarmLabel = "";

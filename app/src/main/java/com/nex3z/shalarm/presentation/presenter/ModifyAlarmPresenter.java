@@ -64,6 +64,7 @@ public abstract class ModifyAlarmPresenter implements Presenter {
             mAlarmModel = new AlarmModel();
             Uri ringtone = RingtoneManager.getActualDefaultRingtoneUri(mView.getContext(),
                     RingtoneManager.TYPE_ALARM);
+            ringtone = ringtone == null ? Uri.EMPTY : ringtone;
             mAlarmModel.setRingtone(ringtone);
         }
         mView.renderAlarm(mAlarmModel);
