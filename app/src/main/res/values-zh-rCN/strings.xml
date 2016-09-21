@@ -12,6 +12,8 @@
     <string name="nav_header_next_alarm_at">下一个闹钟：</string>
     <string name="nav_header_no_enabled_alarm">无</string>
 
+    <string name="alarm_list_no_alarms">没有闹钟</string>
+
     <string name="action_settings">设置</string>
     <string name="action_save">保存</string>
     <string name="action_delete">删除</string>

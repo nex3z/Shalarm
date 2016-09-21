@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.nex3z.shalarm.R;
@@ -45,6 +46,7 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
     public static final String FILTER_ALL_ALARMS = "filter_all_alarms";
 
     @BindView(R.id.rv_alarm_list) RecyclerView mRvAlarmList;
+    @BindView(R.id.linear_no_alarm) LinearLayout mLinearNoAlarm;
 
     private String mFilter = FILTER_ALL_ALARMS;
     private AlarmAdapter mAlarmAdapter;
@@ -133,6 +135,12 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
 
     @Override
     public void renderAlarmList(Collection<AlarmModel> alarmModelCollection) {
+        if (alarmModelCollection.isEmpty()) {
+            mLinearNoAlarm.setVisibility(View.VISIBLE);
+        } else {
+            mLinearNoAlarm.setVisibility(View.GONE);
+        }
+
         mAlarmAdapter.setAlarmCollection(alarmModelCollection);
     }
 

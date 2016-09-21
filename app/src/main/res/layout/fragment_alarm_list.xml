@@ -10,4 +10,27 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/item_alarm"/>
 
+    <LinearLayout
+        android:id="@+id/linear_no_alarm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/ic_no_alarm_48dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="16sp"
+            android:text="@string/alarm_list_no_alarms"/>
+
+    </LinearLayout>
+
 </FrameLayout>
