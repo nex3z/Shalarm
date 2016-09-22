@@ -1,17 +1,12 @@
 package com.nex3z.shalarm.presentation.alert;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
+import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.nex3z.shalarm.data.entity.mapper.AlarmEntityDataMapper;
-import com.nex3z.shalarm.data.executor.JobExecutor;
 import com.nex3z.shalarm.data.repository.AlarmDataRepository;
 import com.nex3z.shalarm.data.repository.datasource.alarm.AlarmDataStoreFactory;
 import com.nex3z.shalarm.domain.Alarm;
@@ -30,20 +25,17 @@ import java.util.TreeSet;
 
 import rx.android.schedulers.AndroidSchedulers;
 
-public class AlarmService extends Service {
+public class AlarmService extends IntentService {
     private static final String LOG_TAG = AlarmService.class.getSimpleName();
 
-    public static final String EXTRA_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.extra.EXTRA_NEXT_ALARM";
-    public static final String EXTRA_NEXT_ALARM_BUNDLE = "com.nex3z.shalarm.presentation.alert.extra.EXTRA_NEXT_ALARM_BUNDLE";
+    private static final String ACTION_SCHEDULE_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.action.SCHEDULE_NEXT_ALARM";
 
-    public static final String ACTION_SCHEDULE_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.action.SCHEDULE_NEXT_ALARM";
-    public static final String ACTION_RETRIEVE_NEXT_ALARM = "com.nex3z.shalarm.presentation.alert.action.RETRIEVE_NEXT_ALARM";
-    public static final String ACTION_NEXT_ALARM_UPDATE = "com.nex3z.shalarm.presentation.alert.action.ACTION_NEXT_ALARM_UPDATE";
-    public static final String ACTION_SET_ALARM = "com.nex3z.shalarm.presentation.alert.action.ACTION_SET_ALARM";
-
-    private AlarmModelDataMapper mMapper = new AlarmModelDataMapper();
     private UseCase mGetAlarmList;
-    private AlarmModel mNextAlarm;
+    private AlarmModelDataMapper mMapper = new AlarmModelDataMapper();
+
+    public AlarmService() {
+        super("AlarmService");
+    }
 
     public static void startActionScheduleNextAlarm(Context context) {
         Intent intent = new Intent(context, AlarmService.class);
@@ -51,97 +43,50 @@ public class AlarmService extends Service {
         context.startService(intent);
     }
 
-    public static void startActionRetrieveNextAlarm(Context context) {
-        Intent intent = new Intent(context, AlarmService.class);
-        intent.setAction(ACTION_RETRIEVE_NEXT_ALARM);
-        context.startService(intent);
-    }
-
     @Override
-    public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        final String action = intent.getAction();
-        Log.v(LOG_TAG, "onStartCommand(): action = " + action);
-
-        if (action.equals(ACTION_SCHEDULE_NEXT_ALARM)) {
-            handleActionScheduleNextAlarm();
-        } else if (action.equals(ACTION_RETRIEVE_NEXT_ALARM)) {
-            handleActionRetrieveNextAlarm();
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
+            final String action = intent.getAction();
+            if (action.equals(ACTION_SCHEDULE_NEXT_ALARM)) {
+                handleScheduleNextAlarm();
+            }
         }
-
-        return START_STICKY;
-    }
-
-    private void handleActionScheduleNextAlarm() {
-        AlarmRepository repository = new AlarmDataRepository(
-                new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
-        mGetAlarmList = new GetAlarmList(new GetAlarmListArg(), repository,
-                new JobExecutor(), () -> {
-            Handler handler = new Handler();
-            return AndroidSchedulers.from(handler.getLooper());
-        });
-
-        mGetAlarmList.execute(new GetAlarmListSubscriber());
-    }
-
-    private void handleActionRetrieveNextAlarm() {
-        Log.v(LOG_TAG, "handleActionRetrieveNextAlarm(): mNextAlarm = " + mNextAlarm);
-        notifyNextAlarm(mNextAlarm);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mGetAlarmList.unsubscribe();
+        if (mGetAlarmList != null) {
+            mGetAlarmList.unsubscribe();
+        }
+    }
+
+    private void handleScheduleNextAlarm() {
+        Log.v(LOG_TAG, "handleScheduleAlarm()");
+        AlarmRepository repository = new AlarmDataRepository(
+                new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
+        mGetAlarmList = new GetAlarmList(
+                new GetAlarmListArg(),
+                repository,
+                Runnable::run,
+                () -> AndroidSchedulers.from(new Handler().getLooper()));
+
+        mGetAlarmList.execute(new DefaultSubscriber<List<Alarm>>() {
+            @Override
+            public void onNext(List<Alarm> alarms) {
+                scheduleNextAlarm(mMapper.transform(alarms));
+                this.unsubscribe();
+            }
+        });
     }
 
     private void scheduleNextAlarm(List<AlarmModel> alarms) {
-        mNextAlarm = getNextAlarm(alarms);
-        Log.v(LOG_TAG, "scheduleNextAlarm(): nextAlarm = " + mNextAlarm);
-
-        Context context = getApplicationContext();
-        if (mNextAlarm != null) {
-
-            Intent intent = new Intent(ACTION_SET_ALARM);
-            Bundle alarmBundle = new Bundle();
-            alarmBundle.putParcelable(EXTRA_NEXT_ALARM, mNextAlarm);
-            intent.putExtra(EXTRA_NEXT_ALARM_BUNDLE, alarmBundle);
-
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
-                    PendingIntent.FLAG_CANCEL_CURRENT);
-
-            AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-            manager.set(AlarmManager.RTC_WAKEUP, mNextAlarm.getNextAlertTime().getTime(),
-                    pendingIntent);
-
-            Log.v(LOG_TAG, "scheduleNextAlarm(): set next alarm at "
-                    + mNextAlarm.getNextAlertTime());
-        } else {
-            Intent intent = new Intent(ACTION_SET_ALARM);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0,
-                    intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager alarmManager = (AlarmManager)getApplicationContext()
-                    .getSystemService(Context.ALARM_SERVICE);
-            alarmManager.cancel(pendingIntent);
-        }
-
-        notifyNextAlarm(mNextAlarm);
+        AlarmModel nextAlarm = findNextAlarm(alarms);
+        Log.v(LOG_TAG, "scheduleNextAlarm(): nextAlarm = " + nextAlarm);
+        AlertManager.getInstance().setNextAlarm(nextAlarm);
     }
 
-    private void notifyNextAlarm(AlarmModel alarmModel) {
-        Log.v(LOG_TAG, "notifyNextAlarm(): alarmModel = " + alarmModel);
-        Intent intent = new Intent(ACTION_NEXT_ALARM_UPDATE);
-        if (alarmModel != null) {
-            intent.putExtra(EXTRA_NEXT_ALARM, alarmModel);
-        }
-        sendBroadcast(intent);
-    }
-
-    private AlarmModel getNextAlarm(List<AlarmModel> alarms) {
+    private AlarmModel findNextAlarm(List<AlarmModel> alarms) {
         Set<AlarmModel> alarmQueue = new TreeSet<AlarmModel>(new AlarmComparator());
 
         for (AlarmModel alarmModel : alarms) {
@@ -154,19 +99,6 @@ public class AlarmService extends Service {
             return alarmQueue.iterator().next();
         }else{
             return null;
-        }
-    }
-
-    private final class GetAlarmListSubscriber extends DefaultSubscriber<List<Alarm>> {
-        @Override
-        public void onError(Throwable e) {
-            Log.e(LOG_TAG, "onError(): " + e.getMessage());
-        }
-
-        @Override
-        public void onNext(List<Alarm> alarms) {
-            scheduleNextAlarm(mMapper.transform(alarms));
-            this.unsubscribe();
         }
     }
 

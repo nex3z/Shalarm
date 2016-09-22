@@ -15,7 +15,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".presentation.ui.activity.AlarmListActivity"
             android:label="@string/app_name"
@@ -26,7 +25,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".presentation.ui.activity.AddAlarmActivity"
             android:label="@string/title_activity_add_alarm"
@@ -36,7 +34,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>
         </activity>
-
         <activity
             android:name=".presentation.ui.activity.EditAlarmActivity"
             android:label="@string/title_activity_edit_alarm"
@@ -46,16 +43,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>
         </activity>
-
         <activity
             android:name=".presentation.alert.ui.AlertActivity"
             android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
             android:label="@string/title_activity_alert"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBarShowStatusBar">
         </activity>
-
         <activity
             android:name=".presentation.ui.activity.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -65,7 +60,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity"/>
         </activity>
-
         <activity
             android:name=".presentation.ui.activity.CalibrateActivity"
             android:label="@string/title_activity_calibrate"
@@ -78,12 +72,6 @@
             android:authorities="com.nex3z.shalarm.alarm"
             android:exported="false"/>
 
-        <service
-            android:name=".presentation.alert.AlarmService"
-            android:enabled="true"
-            android:process="com.nex3z.shalarm.service.alarmServiceProcess">
-        </service>
-
         <receiver
             android:name=".presentation.alert.AlarmServiceBroadcastReceiver"
             android:enabled="true">
@@ -91,7 +79,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".presentation.alert.AlertBroadcastReceiver"
             android:enabled="true"
@@ -101,6 +88,10 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".presentation.alert.AlarmService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

@@ -24,7 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nex3z.shalarm.R;
-import com.nex3z.shalarm.presentation.alert.AlarmService;
+import com.nex3z.shalarm.presentation.alert.AlertManager;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.ui.adapter.AlarmAdapter;
 import com.nex3z.shalarm.presentation.ui.fragment.AlarmListFragment;
@@ -73,10 +73,10 @@ public class AlarmListActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         mFab.show();
-        IntentFilter intentFilter = new IntentFilter(AlarmService.ACTION_NEXT_ALARM_UPDATE);
+        IntentFilter intentFilter = new IntentFilter(AlertManager.ACTION_NEXT_ALARM_UPDATE);
         registerReceiver(mReceiver, intentFilter);
-
-        AlarmService.startActionRetrieveNextAlarm(this);
+        AlarmModel nextAlarm = AlertManager.getInstance().getNextAlarm();
+        renderNextAlarmTime(nextAlarm);
     }
 
     @Override
@@ -188,8 +188,8 @@ public class AlarmListActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            if (action.equals(AlarmService.ACTION_NEXT_ALARM_UPDATE)) {
-                AlarmModel alarmModel = intent.getParcelableExtra(AlarmService.EXTRA_NEXT_ALARM);
+            if (action.equals(AlertManager.ACTION_NEXT_ALARM_UPDATE)) {
+                AlarmModel alarmModel = intent.getParcelableExtra(AlertManager.EXTRA_NEXT_ALARM);
                 Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
                 renderNextAlarmTime(alarmModel);
             }

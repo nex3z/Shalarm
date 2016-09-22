@@ -17,13 +17,13 @@ public class AlertBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
 
-        if (action.equals(AlarmService.ACTION_SET_ALARM)) {
+        if (action.equals(AlertManager.ACTION_SET_ALARM)) {
             AlarmUtility.scheduleNextAlarm(context);
 
             AlertWakeLock.lock(context);
 
-            Bundle alarmBundle = intent.getBundleExtra(AlarmService.EXTRA_NEXT_ALARM_BUNDLE);
-            AlarmModel alarmModel = alarmBundle.getParcelable(AlarmService.EXTRA_NEXT_ALARM);
+            Bundle alarmBundle = intent.getBundleExtra(AlertManager.EXTRA_NEXT_ALARM_BUNDLE);
+            AlarmModel alarmModel = alarmBundle.getParcelable(AlertManager.EXTRA_NEXT_ALARM);
             Log.v(LOG_TAG, "onReceive(): alarmModel = " + alarmModel);
             if (alarmModel != null) {
                 Intent alertIntent = new Intent(context, AlertActivity.class);
