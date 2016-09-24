@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -37,6 +39,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         void onItemClick(int position, AlarmAdapter.ViewHolder vh);
         void onCheckedChanged(int position, boolean isEnabled);
     }
+
+    @Inject
+    public AlarmAdapter() {}
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

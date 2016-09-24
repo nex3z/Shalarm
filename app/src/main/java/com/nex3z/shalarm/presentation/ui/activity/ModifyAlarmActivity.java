@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -31,8 +30,6 @@ import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -41,37 +38,30 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
-public abstract class ModifyAlarmActivity extends AppCompatActivity implements AddAlarmView,
+public abstract class ModifyAlarmActivity extends BaseActivity implements AddAlarmView,
         TimePickerDialog.OnTimeSetListener {
     private static final String LOG_TAG = ModifyAlarmActivity.class.getSimpleName();
     private static final String TAG_TIME_PICKER = "tag_time_picker";
     private static final int PICK_RINGTONE_REQUEST = 1;
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
-
     private static final String STATE_ALARM_MODEL = "state_alarm";
 
     public static final String ALARM_INFO = "alarm_info";
 
+    @BindView(R.id.toolbar) Toolbar mToolbar;
+    @BindView(R.id.toggle_weekdays) MultiSelectToggleGroup mToggleWeekdays;
+    @BindView(R.id.tv_alarm_time) TextView mTvAlarmTime;
+    @BindView(R.id.sw_vibrate) Switch mSwVibrate;
+    @BindView(R.id.sb_shake_power) SeekBar mSbShakePower;
+    @BindView(R.id.edit_label) EditText mEditLabel;
+    @BindView(R.id.btn_ringtone) Button mBtnRingtone;
+    @BindView(R.id.tv_shake_power_description) TextView mTvShakePowerDescription;
+
+    private Unbinder mUnbinder;
     private ModifyAlarmPresenter mPresenter;
     private Uri mRingtone;
-
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
-    @BindView(R.id.toggle_weekdays)
-    MultiSelectToggleGroup mToggleWeekdays;
-    @BindView(R.id.tv_alarm_time)
-    TextView mTvAlarmTime;
-    @BindView(R.id.sw_vibrate)
-    Switch mSwVibrate;
-    @BindView(R.id.sb_shake_power)
-    SeekBar mSbShakePower;
-    @BindView(R.id.edit_label)
-    EditText mEditLabel;
-    @BindView(R.id.btn_ringtone)
-    Button mBtnRingtone;
-    @BindView(R.id.tv_shake_power_description)
-    TextView mTvShakePowerDescription;
 
     abstract protected ModifyAlarmPresenter getPresenter(AlarmModel alarmModel);
 
@@ -269,24 +259,21 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
 
     private void init(AlarmModel alarm) {
         initView();
-        initPresenter(alarm);
+        setupPresenter(alarm);
     }
 
     private void initView() {
-        initActionBar();
-        initMultiSwitchToggle();
-        initProgressBar();
+        setupActionBar();
+        setupProgressBar();
     }
 
-    private void initPresenter(AlarmModel alarmModel) {
-        Log.v(LOG_TAG, "initPresenter(): alarmModel = " + alarmModel);
+    private void setupPresenter(AlarmModel alarmModel) {
         mPresenter = getPresenter(alarmModel);
-
         mPresenter.setView(this);
         mPresenter.initialize();
     }
 
-    private void initActionBar() {
+    private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -295,12 +282,7 @@ public abstract class ModifyAlarmActivity extends AppCompatActivity implements A
         }
     }
 
-    private void initMultiSwitchToggle() {
-        String[] weekdays = getResources().getStringArray(R.array.weekdays);
-        ArrayList<String> weekdaysList = new ArrayList<>(Arrays.asList(weekdays));
-    }
-
-    private void initProgressBar() {
+    private void setupProgressBar() {
         mSbShakePower.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {

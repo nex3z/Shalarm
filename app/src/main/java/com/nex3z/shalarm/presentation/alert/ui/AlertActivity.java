@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -25,30 +24,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nex3z.shalarm.R;
-import com.nex3z.shalarm.data.entity.mapper.AlarmEntityDataMapper;
-import com.nex3z.shalarm.data.executor.JobExecutor;
-import com.nex3z.shalarm.data.repository.AlarmDataRepository;
-import com.nex3z.shalarm.data.repository.datasource.alarm.AlarmDataStoreFactory;
-import com.nex3z.shalarm.domain.interactor.UseCase;
-import com.nex3z.shalarm.domain.interactor.alarm.update.UpdateAlarm;
-import com.nex3z.shalarm.domain.mapper.AlarmDataMapper;
-import com.nex3z.shalarm.domain.repository.AlarmRepository;
-import com.nex3z.shalarm.presentation.UIThread;
 import com.nex3z.shalarm.presentation.alert.AlertWakeLock;
-import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
+import com.nex3z.shalarm.presentation.internal.di.HasComponent;
+import com.nex3z.shalarm.presentation.internal.di.component.AlarmComponent;
+import com.nex3z.shalarm.presentation.internal.di.component.DaggerAlarmComponent;
+import com.nex3z.shalarm.presentation.internal.di.module.AlarmModule;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.AlertPresenter;
 import com.nex3z.shalarm.presentation.ui.activity.AlarmListActivity;
+import com.nex3z.shalarm.presentation.ui.activity.BaseActivity;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
 import java.util.Date;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class AlertActivity extends AppCompatActivity implements AlertView, SensorEventListener {
+public class AlertActivity extends BaseActivity implements AlertView, SensorEventListener,
+        HasComponent<AlarmComponent> {
     private static final String LOG_TAG = AlertActivity.class.getSimpleName();
 
     private static final int NOTIFICATION_ID_MISSED_ALARM = 1;
@@ -62,9 +59,16 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     public static final String ALARM = "alarm";
 
+    @BindView(R.id.tv_time) TextView mTvTime;
+    @BindView(R.id.tv_label) TextView mTvLabel;
+    @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
+
+    @Inject AlertPresenter mPresenter;
+
+    private AlarmComponent mAlarmComponent;
     private Vibrator mVibrator;
     private MediaPlayer mMediaPlayer;
-    private AlertPresenter mPresenter;
+
     private Handler mClockUpdateHandler = new Handler();
     private Runnable mClockUpdateRunnable = new Runnable() {
         @Override
@@ -76,10 +80,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-
-    @BindView(R.id.tv_time) TextView mTvTime;
-    @BindView(R.id.tv_label) TextView mTvLabel;
-    @BindView(R.id.circle_shake_power) ExpandableCircleView mCircle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +95,8 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         ButterKnife.bind(this);
 
         AlarmModel alarmModel = getIntent().getParcelableExtra(ALARM);
-
         Log.v(LOG_TAG, "onCreate(): Alarm fired, id = " + alarmModel.getId() + ", label = "
                 + alarmModel.getAlarmLabel());
-
         init(alarmModel);
     }
 
@@ -173,7 +171,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         try {
             mMediaPlayer.start();
         } catch (IllegalStateException e) {
-            Log.e(LOG_TAG, "startRingtone(): IllegalStateException " + e.getMessage());
+            Log.e(LOG_TAG, "startRingtone(): IllegalStateException");
         }
     }
 
@@ -182,7 +180,7 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         try {
             mMediaPlayer.pause();
         } catch (IllegalStateException e) {
-            Log.e(LOG_TAG, "pauseRingtone(): IllegalStateException " + e.getMessage());
+            Log.e(LOG_TAG, "pauseRingtone(): IllegalStateException");
         }
     }
 
@@ -266,35 +264,40 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
         NotificationManager.notify(NOTIFICATION_ID_MISSED_ALARM, mBuilder.build());
     }
 
-    private void init(AlarmModel alarmModel) {
-        initAlert();
-        initShakeDetector();
-        initPresenter(alarmModel);
-        initPhoneStateListener();
+    @Override
+    public AlarmComponent getComponent() {
+        return mAlarmComponent;
     }
 
-    private void initShakeDetector() {
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    private void init(AlarmModel alarmModel) {
+        initAlert();
+        initInjector(alarmModel);
+        setupPresenter();
+        setupPhoneStateListener();
+    }
+
+    private void initInjector(AlarmModel alarmModel) {
+        mAlarmComponent = DaggerAlarmComponent.builder()
+                .appComponent(getAppComponent())
+                .activityModule(getActivityModule())
+                .alarmModule(new AlarmModule(alarmModel))
+                .build();
+        mAlarmComponent.inject(this);
     }
 
     private void initAlert() {
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         mMediaPlayer = new MediaPlayer();
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
-    private void initPresenter(AlarmModel alarmModel) {
-        AlarmRepository repository = new AlarmDataRepository(
-                new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
-        UseCase useCase = new UpdateAlarm(repository, new JobExecutor(), new UIThread());
-        mPresenter = new AlertPresenter(alarmModel, useCase, new AlarmModelDataMapper());
-
+    private void setupPresenter() {
         mPresenter.setView(this);
         mPresenter.initialize();
     }
 
-
-    private void initPhoneStateListener() {
+    private void setupPhoneStateListener() {
         TelephonyManager telephonyManager = (TelephonyManager)
                 this.getSystemService(Context.TELEPHONY_SERVICE);
 
@@ -303,8 +306,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
             public void onCallStateChanged(int state, String incomingNumber) {
                 switch (state) {
                     case TelephonyManager.CALL_STATE_RINGING:
-                        Log.v(LOG_TAG, "onCallStateChanged(): CALL_STATE_RINGING, number = "
-                                + incomingNumber);
                         try {
                             mPresenter.onCallStateRinging();
                         } catch (IllegalStateException e) {
@@ -312,7 +313,6 @@ public class AlertActivity extends AppCompatActivity implements AlertView, Senso
                         }
                         break;
                     case TelephonyManager.CALL_STATE_IDLE:
-                        Log.v(LOG_TAG, "onCallStateChanged(): CALL_STATE_IDLE");
                         try {
                             mPresenter.onCallStateIdle();
                         } catch (IllegalStateException e) {

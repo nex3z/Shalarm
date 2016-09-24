@@ -40,6 +40,10 @@ public abstract class ModifyAlarmPresenter implements Presenter {
         this(alarmModel, modifyAlarm, null, mapper);
     }
 
+    public void setAlarmModel(AlarmModel alarmModel) {
+        mAlarmModel = alarmModel;
+    }
+
     @Override
     public void resume() {}
 

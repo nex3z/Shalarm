@@ -12,7 +12,7 @@ public class UpdateAlarmPresenter extends ModifyAlarmPresenter {
     private static final String LOG_TAG = UpdateAlarmPresenter.class.getSimpleName();
 
     public UpdateAlarmPresenter(AlarmModel alarmModel, UseCase updateAlarm, UseCase deleteAlarm,
-                             AlarmModelDataMapper mapper) {
+                                AlarmModelDataMapper mapper) {
         super(alarmModel, updateAlarm, deleteAlarm, mapper);
     }
 

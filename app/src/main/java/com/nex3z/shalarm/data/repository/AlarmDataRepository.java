@@ -9,14 +9,19 @@ import com.nex3z.shalarm.domain.repository.AlarmRepository;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import rx.Observable;
 
+@Singleton
 public class AlarmDataRepository implements AlarmRepository {
 
     private final AlarmDataStoreFactory mAlarmDataStoreFactory;
     private final AlarmEntityDataMapper mAlarmEntityDataMapper;
     private final AlarmDataMapper mAlarmDataMapper;
 
+    @Inject
     public AlarmDataRepository(AlarmDataStoreFactory factory,
                                AlarmEntityDataMapper alarmEntityDataMapper,
                                AlarmDataMapper alarmDataMapper) {

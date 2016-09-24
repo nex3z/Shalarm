@@ -6,6 +6,8 @@ import com.nex3z.shalarm.domain.Alarm;
 import com.nex3z.shalarm.domain.interactor.DefaultSubscriber;
 import com.nex3z.shalarm.domain.interactor.UseCase;
 import com.nex3z.shalarm.domain.interactor.alarm.insert.AlarmArg;
+import com.nex3z.shalarm.domain.interactor.alarm.query.GetAlarmListArg;
+import com.nex3z.shalarm.presentation.internal.di.PerActivity;
 import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.ui.AlarmListView;
@@ -13,6 +15,10 @@ import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@PerActivity
 public class AlarmListPresenter implements Presenter {
     private static final String LOG_TAG = AlarmListPresenter.class.getSimpleName();
 
@@ -23,7 +29,9 @@ public class AlarmListPresenter implements Presenter {
     private UseCase mUpdateAlarm;
     private AlarmModelDataMapper mMapper;
 
-    public AlarmListPresenter(UseCase getAlarmList, UseCase updateAlarm,
+    @Inject
+    public AlarmListPresenter(@Named("getAlarmList") UseCase getAlarmList,
+                              @Named("updateAlarm") UseCase updateAlarm,
                               AlarmModelDataMapper mapper) {
         mGetAlarmList = getAlarmList;
         mUpdateAlarm = updateAlarm;
@@ -48,8 +56,32 @@ public class AlarmListPresenter implements Presenter {
     }
 
     public void initialize() {
-        loadAlarmList();
         AlarmUtility.scheduleNextAlarm(mView.getContext());
+    }
+
+    public void loadAllAlarms() {
+        GetAlarmListArg arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC);
+        loadAlarmList(arg);
+    }
+
+    public void loadEnableAlarms() {
+        GetAlarmListArg arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC,
+                GetAlarmListArg.FILTER_ENABLED_ALARMS);
+        loadAlarmList(arg);
+    }
+
+    public void loadDisabledAlarms() {
+        GetAlarmListArg arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC,
+                GetAlarmListArg.FILTER_DISABLED_ALARMS);
+        loadAlarmList(arg);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadAlarmList(GetAlarmListArg arg) {
+        if (arg != null) {
+            mGetAlarmList.init(arg);
+        }
+        mGetAlarmList.execute(new GetAlarmListSubscriber());
     }
 
     @SuppressWarnings("unchecked")
@@ -63,10 +95,6 @@ public class AlarmListPresenter implements Presenter {
                 mUpdateAlarm.init(arg).execute(new UpdateAlarmSubscriber());
             }
         }
-    }
-
-    private void loadAlarmList() {
-        mGetAlarmList.execute(new GetAlarmListSubscriber());
     }
 
     private void showAlarmListInView(List<Alarm> alarmList) {

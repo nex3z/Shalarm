@@ -13,25 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.nex3z.shalarm.presentation.internal.di;
 
-package com.nex3z.shalarm.presentation;
-
-import com.nex3z.shalarm.domain.executor.PostExecutionThread;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
-
-@Singleton
-public class UIThread implements PostExecutionThread {
-
-    @Inject
-    public UIThread() {}
-
-    @Override
-    public Scheduler getScheduler() {
-        return AndroidSchedulers.mainThread();
-    }
+/**
+ * Interface representing a contract for clients that contains a component for dependency injection.
+ */
+public interface HasComponent<C> {
+  C getComponent();
 }
