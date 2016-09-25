@@ -3,9 +3,13 @@ package com.nex3z.shalarm.presentation.presenter;
 import android.util.Log;
 
 import com.nex3z.shalarm.R;
+import com.nex3z.shalarm.presentation.internal.di.PerActivity;
 import com.nex3z.shalarm.presentation.ui.CalibrateView;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
+import javax.inject.Inject;
+
+@PerActivity
 public class CalibratePresenter implements Presenter {
     private static final String LOG_TAG = CalibratePresenter.class.getSimpleName();
 
@@ -13,6 +17,9 @@ public class CalibratePresenter implements Presenter {
 
     private CalibrateView mView;
     private float mMaxForce = 0;
+
+    @Inject
+    public CalibratePresenter() {}
 
     public void setView(CalibrateView view) {
         mView = view;

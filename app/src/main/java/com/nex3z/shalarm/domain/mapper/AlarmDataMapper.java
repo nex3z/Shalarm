@@ -3,7 +3,14 @@ package com.nex3z.shalarm.domain.mapper;
 import com.nex3z.shalarm.data.entity.AlarmEntity;
 import com.nex3z.shalarm.domain.Alarm;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class AlarmDataMapper {
+
+    @Inject
+    public AlarmDataMapper() {}
 
     public AlarmEntity toAlarmEntity(Alarm alarm) {
         AlarmEntity alarmEntity = null;

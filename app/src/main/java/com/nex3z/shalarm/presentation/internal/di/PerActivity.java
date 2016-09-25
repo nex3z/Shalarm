@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.nex3z.shalarm.presentation.internal.di;
 
-package com.nex3z.shalarm.presentation;
+import java.lang.annotation.Retention;
+import javax.inject.Scope;
 
-import com.nex3z.shalarm.domain.executor.PostExecutionThread;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
-
-@Singleton
-public class UIThread implements PostExecutionThread {
-
-    @Inject
-    public UIThread() {}
-
-    @Override
-    public Scheduler getScheduler() {
-        return AndroidSchedulers.mainThread();
-    }
-}
+/**
+ * A scoping annotation to permit objects whose lifetime should
+ * conform to the life of the activity to be memorized in the
+ * correct component.
+ */
+@Scope
+@Retention(RUNTIME)
+public @interface PerActivity {}

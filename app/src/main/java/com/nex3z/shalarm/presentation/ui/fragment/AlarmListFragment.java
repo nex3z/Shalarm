@@ -2,8 +2,6 @@ package com.nex3z.shalarm.presentation.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,18 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.nex3z.shalarm.R;
-import com.nex3z.shalarm.data.entity.mapper.AlarmEntityDataMapper;
-import com.nex3z.shalarm.data.executor.JobExecutor;
-import com.nex3z.shalarm.data.repository.AlarmDataRepository;
-import com.nex3z.shalarm.data.repository.datasource.alarm.AlarmDataStoreFactory;
-import com.nex3z.shalarm.domain.interactor.UseCase;
-import com.nex3z.shalarm.domain.interactor.alarm.query.GetAlarmList;
-import com.nex3z.shalarm.domain.interactor.alarm.query.GetAlarmListArg;
-import com.nex3z.shalarm.domain.interactor.alarm.update.UpdateAlarm;
-import com.nex3z.shalarm.domain.mapper.AlarmDataMapper;
-import com.nex3z.shalarm.domain.repository.AlarmRepository;
-import com.nex3z.shalarm.presentation.UIThread;
-import com.nex3z.shalarm.presentation.mapper.AlarmModelDataMapper;
+import com.nex3z.shalarm.presentation.internal.di.component.AlarmComponent;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.AlarmListPresenter;
 import com.nex3z.shalarm.presentation.ui.AlarmListView;
@@ -33,10 +20,13 @@ import com.nex3z.shalarm.presentation.ui.adapter.AlarmAdapter;
 
 import java.util.Collection;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
-public class AlarmListFragment extends Fragment implements AlarmListView {
+public class AlarmListFragment extends BaseFragment implements AlarmListView {
     private static final String LOG_TAG = AlarmListFragment.class.getSimpleName();
 
     private static final String ALARM_FILTER = "alarm_filter";
@@ -48,9 +38,11 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
     @BindView(R.id.rv_alarm_list) RecyclerView mRvAlarmList;
     @BindView(R.id.linear_no_alarm) LinearLayout mLinearNoAlarm;
 
+    @Inject AlarmAdapter mAlarmAdapter;
+    @Inject AlarmListPresenter mPresenter;
+
+    private Unbinder mUnbinder;
     private String mFilter = FILTER_ALL_ALARMS;
-    private AlarmAdapter mAlarmAdapter;
-    private AlarmListPresenter mPresenter;
     private Callbacks mCallbacks = sDummyCallbacks;
 
     private static Callbacks sDummyCallbacks = (alarm, vh) -> { };
@@ -72,15 +64,26 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (!(context instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    protected boolean onInjectView() throws IllegalStateException {
+        getComponent(AlarmComponent.class).inject(this);
+        return true;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_alarm_list, container, false);
-        ButterKnife.bind(this, rootView);
+
+        mUnbinder = ButterKnife.bind(this, rootView);
 
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -94,25 +97,11 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        init();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (!(context instanceof Callbacks)) {
-            throw new IllegalStateException("Activity must implement fragment's callbacks.");
-        }
-        mCallbacks = (Callbacks) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mCallbacks = sDummyCallbacks;
+    protected void onViewInjected(Bundle savedInstanceState) {
+        super.onViewInjected(savedInstanceState);
+        setupRecyclerView();
+        mPresenter.setView(this);
+        loadAlarms();
     }
 
     @Override
@@ -128,9 +117,21 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mRvAlarmList.setAdapter(null);
+        mUnbinder.unbind();
+    }
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mPresenter.destroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = sDummyCallbacks;
     }
 
     @Override
@@ -149,41 +150,7 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 
-    private void init() {
-        initPresenter();
-        initRecyclerView();
-        loadAlarms();
-    }
-
-    private void initPresenter() {
-        AlarmRepository repository = new AlarmDataRepository(
-                new AlarmDataStoreFactory(), new AlarmEntityDataMapper(), new AlarmDataMapper());
-
-        GetAlarmListArg arg;
-        switch (mFilter) {
-            case FILTER_ENABLED_ALARMS:
-                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC,
-                        GetAlarmListArg.FILTER_ENABLED_ALARMS);
-                break;
-            case FILTER_DISABLED_ALARMS:
-                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC,
-                        GetAlarmListArg.FILTER_DISABLED_ALARMS);
-                break;
-            case FILTER_ALL_ALARMS:
-            default:
-                arg = new GetAlarmListArg(GetAlarmListArg.SORT_BY_START_ASC);
-                break;
-        }
-        UseCase getAlarmList = new GetAlarmList(arg, repository, new JobExecutor(), new UIThread());
-
-        UseCase updateAlarm = new UpdateAlarm(repository, new JobExecutor(), new UIThread());
-        mPresenter = new AlarmListPresenter(getAlarmList, updateAlarm,new AlarmModelDataMapper());
-
-        mPresenter.setView(this);
-    }
-
-    private void initRecyclerView() {
-        mAlarmAdapter = new AlarmAdapter();
+    private void setupRecyclerView() {
         mAlarmAdapter.setOnItemClickListener(new AlarmAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position, AlarmAdapter.ViewHolder vh) {
@@ -206,7 +173,18 @@ public class AlarmListFragment extends Fragment implements AlarmListView {
 
     private void loadAlarms() {
         mPresenter.initialize();
+        switch (mFilter) {
+            case FILTER_ENABLED_ALARMS:
+                mPresenter.loadEnableAlarms();
+                break;
+            case FILTER_DISABLED_ALARMS:
+                mPresenter.loadDisabledAlarms();
+                break;
+            case FILTER_ALL_ALARMS:
+            default:
+                mPresenter.loadAllAlarms();
+                break;
+        }
     }
-
 
 }

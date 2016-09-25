@@ -11,8 +11,7 @@ import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 public class AddAlarmPresenter extends ModifyAlarmPresenter {
     private static final String LOG_TAG = AddAlarmPresenter.class.getSimpleName();
 
-    public AddAlarmPresenter(AlarmModel alarmModel, UseCase addAlarm,
-                             AlarmModelDataMapper mapper) {
+    public AddAlarmPresenter(AlarmModel alarmModel, UseCase addAlarm, AlarmModelDataMapper mapper) {
         super(alarmModel, addAlarm, mapper);
     }
 

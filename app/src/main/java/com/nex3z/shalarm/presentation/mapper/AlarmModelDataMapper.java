@@ -2,16 +2,21 @@ package com.nex3z.shalarm.presentation.mapper;
 
 import android.net.Uri;
 
-import com.nex3z.shalarm.data.entity.AlarmEntity;
 import com.nex3z.shalarm.domain.Alarm;
+import com.nex3z.shalarm.presentation.internal.di.PerActivity;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
+@PerActivity
 public class AlarmModelDataMapper {
+
+    @Inject
+    public AlarmModelDataMapper() {}
 
     public AlarmModel transform(Alarm alarm) {
         AlarmModel alarmModel = null;

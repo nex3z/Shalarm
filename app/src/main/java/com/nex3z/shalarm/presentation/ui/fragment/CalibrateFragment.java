@@ -6,8 +6,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,38 +13,47 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nex3z.shalarm.R;
+import com.nex3z.shalarm.presentation.internal.di.component.CalibrateComponent;
 import com.nex3z.shalarm.presentation.presenter.CalibratePresenter;
 import com.nex3z.shalarm.presentation.ui.CalibrateView;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 
-public class CalibrateFragment extends Fragment implements CalibrateView, SensorEventListener {
+public class CalibrateFragment extends BaseFragment implements CalibrateView, SensorEventListener {
     private static final String LOG_TAG = CalibrateFragment.class.getSimpleName();
+
+    @BindView(R.id.tv_maximum_force) TextView mTvMaxForce;
+    @Inject CalibratePresenter mPresenter;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private float mMaxForce = 0;
-
-    private CalibratePresenter mPresenter;
-
-    @BindView(R.id.tv_maximum_force) TextView mTvMaxForce;
+    private Unbinder mUnbinder;
 
     public CalibrateFragment() {}
+
+    @Override
+    protected boolean onInjectView() throws IllegalStateException {
+        getComponent(CalibrateComponent.class).inject(this);
+        return true;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_calibrate, container, false);
-        ButterKnife.bind(this, rootView);
+        mUnbinder = ButterKnife.bind(this, rootView);
         return rootView;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void onViewInjected(Bundle savedInstanceState) {
+        super.onViewInjected(savedInstanceState);
         init();
     }
 
@@ -62,6 +69,12 @@ public class CalibrateFragment extends Fragment implements CalibrateView, Sensor
         super.onPause();
         mPresenter.pause();
         mSensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
     }
 
     @Override
@@ -100,7 +113,6 @@ public class CalibrateFragment extends Fragment implements CalibrateView, Sensor
     }
 
     private void init() {
-        mPresenter = new CalibratePresenter();
         mPresenter.setView(this);
         mPresenter.initialize();
 

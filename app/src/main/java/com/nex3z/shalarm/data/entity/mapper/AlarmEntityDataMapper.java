@@ -10,8 +10,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class AlarmEntityDataMapper {
     private static final String LOG_TAG = AlarmEntityDataMapper.class.getSimpleName();
+
+    @Inject
+    public AlarmEntityDataMapper() {}
 
     public Alarm transform(AlarmEntity alarmEntity) {
         Alarm alarm = null;

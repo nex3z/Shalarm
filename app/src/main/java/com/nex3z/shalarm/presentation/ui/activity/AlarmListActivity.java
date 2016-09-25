@@ -14,7 +14,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -25,6 +24,9 @@ import android.widget.TextView;
 
 import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.presentation.alert.AlertManager;
+import com.nex3z.shalarm.presentation.internal.di.HasComponent;
+import com.nex3z.shalarm.presentation.internal.di.component.AlarmComponent;
+import com.nex3z.shalarm.presentation.internal.di.component.DaggerAlarmComponent;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.ui.adapter.AlarmAdapter;
 import com.nex3z.shalarm.presentation.ui.fragment.AlarmListFragment;
@@ -35,14 +37,15 @@ import java.text.SimpleDateFormat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AlarmListActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AlarmListFragment.Callbacks {
+public class AlarmListActivity extends BaseActivity
+        implements NavigationView.OnNavigationItemSelectedListener, AlarmListFragment.Callbacks,
+        HasComponent<AlarmComponent> {
     private static final String LOG_TAG = AlarmListActivity.class.getSimpleName();
 
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
 
+    private AlarmComponent mAlarmComponent;
     private String mFilter = AlarmListFragment.FILTER_ALL_ALARMS;
-
     private BroadcastReceiver mReceiver = new NextAlarmBroadcastReceiver();
 
     @BindView(R.id.toolbar) Toolbar mToolbar;
@@ -56,6 +59,7 @@ public class AlarmListActivity extends AppCompatActivity
         setContentView(R.layout.activity_alarm_list);
 
         ButterKnife.bind(this);
+        initInjector();
 
         setSupportActionBar(mToolbar);
 
@@ -128,9 +132,22 @@ public class AlarmListActivity extends AppCompatActivity
         ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
     }
 
+    @Override
+    public AlarmComponent getComponent() {
+        Log.v(LOG_TAG, "getComponent(): mAlarmComponent = " + mAlarmComponent);
+        return mAlarmComponent;
+    }
+
     private void initialize() {
         setupDrawer();
         setupFloatingActionButton();
+    }
+
+    private void initInjector() {
+        mAlarmComponent = DaggerAlarmComponent.builder()
+                .appComponent(getAppComponent())
+                .activityModule(getActivityModule())
+                .build();
     }
 
     private void setupDrawer() {
