@@ -29,7 +29,7 @@ import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -45,7 +45,7 @@ public abstract class ModifyAlarmActivity extends BaseActivity implements AddAla
     private static final String LOG_TAG = ModifyAlarmActivity.class.getSimpleName();
     private static final String TAG_TIME_PICKER = "tag_time_picker";
     private static final int PICK_RINGTONE_REQUEST = 1;
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
+    private static final DateFormat TIME_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT);
     private static final String STATE_ALARM_MODEL = "state_alarm";
 
     public static final String ALARM_INFO = "alarm_info";

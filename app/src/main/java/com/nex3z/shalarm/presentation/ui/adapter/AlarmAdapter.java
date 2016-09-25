@@ -15,7 +15,7 @@ import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> {
     private static final String LOG_TAG = AlarmAdapter.class.getSimpleName();
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
+    private static final DateFormat TIME_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT);
     private final Set<Integer> workdays = new HashSet<>();
 
     private static OnItemClickListener mListener;

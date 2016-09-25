@@ -10,7 +10,6 @@ import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.app.App;
 import com.nex3z.shalarm.presentation.alert.AlarmService;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +22,6 @@ public class AlarmUtility {
     private static final Set<Integer> WORK_DAYS = new HashSet<>(Arrays.asList(1, 2, 3, 4, 5));
     private static final int SHAKE_POWER_MEDIUM_THRESHOLD = 33;
     private static final int SHAKE_POWER_HARD_THRESHOLD = 66;
-
-    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
 
     public static void scheduleNextAlarm(Context context) {
         Log.v(LOG_TAG, "scheduleNextAlarm()");

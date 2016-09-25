@@ -36,6 +36,7 @@ import com.nex3z.shalarm.presentation.ui.activity.BaseActivity;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 import com.nex3z.shalarm.presentation.utility.SensorUtility;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -48,6 +49,7 @@ public class AlertActivity extends BaseActivity implements AlertView, SensorEven
         HasComponent<AlarmComponent> {
     private static final String LOG_TAG = AlertActivity.class.getSimpleName();
 
+    private static final DateFormat TIME_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT);
     private static final int NOTIFICATION_ID_MISSED_ALARM = 1;
     private static final int NOTIFICATION_ID_ALERTING = 2;
     private static final String ACTION_ALERTING_NOTIFICATION_DISMISSED = "com.nex3z.shalarm.presentation.alert.ui.action.ALERTING_NOTIFICATION_DISMISSED";
@@ -73,7 +75,7 @@ public class AlertActivity extends BaseActivity implements AlertView, SensorEven
     private Runnable mClockUpdateRunnable = new Runnable() {
         @Override
         public void run() {
-            mTvTime.setText(AlarmUtility.TIME_FORMAT.format(new Date()));
+            mTvTime.setText(TIME_FORMAT.format(new Date()));
             mClockUpdateHandler.postDelayed(this, 1000);
         }
     };
@@ -243,7 +245,7 @@ public class AlertActivity extends BaseActivity implements AlertView, SensorEven
 
     @Override
     public void showMissedAlarmNotification(AlarmModel alarmModel) {
-        String content = AlarmUtility.TIME_FORMAT.format(alarmModel.getStart());
+        String content = TIME_FORMAT.format(alarmModel.getStart());
         if (alarmModel.getAlarmLabel() != null && !alarmModel.getAlarmLabel().isEmpty()) {
             content += " " + alarmModel.getAlarmLabel();
         }
@@ -333,7 +335,7 @@ public class AlertActivity extends BaseActivity implements AlertView, SensorEven
             title = getString(R.string.alerting_notification_title);
         }
 
-        String content = AlarmUtility.TIME_FORMAT.format(alarmModel.getStart());
+        String content = TIME_FORMAT.format(alarmModel.getStart());
 
         Intent clickIntent = new Intent(this, AlertActivity.class);
         clickIntent.setAction(ACTION_RELAUNCH);

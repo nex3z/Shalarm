@@ -32,7 +32,7 @@ import com.nex3z.shalarm.presentation.ui.adapter.AlarmAdapter;
 import com.nex3z.shalarm.presentation.ui.fragment.AlarmListFragment;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,7 +42,7 @@ public class AlarmListActivity extends BaseActivity
         HasComponent<AlarmComponent> {
     private static final String LOG_TAG = AlarmListActivity.class.getSimpleName();
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm");
+    private static final DateFormat TIME_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT);
 
     private AlarmComponent mAlarmComponent;
     private String mFilter = AlarmListFragment.FILTER_ALL_ALARMS;
