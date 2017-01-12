@@ -24,8 +24,8 @@ import com.nex3z.shalarm.R;
 import com.nex3z.shalarm.presentation.model.AlarmModel;
 import com.nex3z.shalarm.presentation.presenter.ModifyAlarmPresenter;
 import com.nex3z.shalarm.presentation.ui.AddAlarmView;
-import com.nex3z.shalarm.presentation.ui.misc.MultiSelectToggleGroup;
 import com.nex3z.shalarm.presentation.utility.AlarmUtility;
+import com.nex3z.togglebuttongroup.MultiSelectToggleGroup;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 

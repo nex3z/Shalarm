@@ -40,4 +40,5 @@ dependencies {
     compile 'com.squareup.sqlbrite:sqlbrite:0.7.0'
     compile 'com.google.dagger:dagger:2.7'
     apt 'com.google.dagger:dagger-compiler:2.7'
+    compile 'com.nex3z:toggle-button-group:0.2.1'
 }
